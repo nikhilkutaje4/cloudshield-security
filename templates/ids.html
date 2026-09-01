@@ -1,0 +1,1111 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>CloudShield · Threat Monitor</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg: #0a0f14;
+            --panel: #0f1519;
+            --panel-2: #131a20;
+            --border: #1a2530;
+            --border-light: #243040;
+            --text: #c9d1d9;
+            --text-dim: #8b949e;
+            --text-mute: #4b5563;
+            --green: #4ade80;
+            --amber: #fbbf24;
+            --red: #f87171;
+            --cyan: #67e8f9;
+            --blue: #60a5fa;
+            --purple: #c084fc;
+            --mono: 'JetBrains Mono', 'Courier New', monospace;
+            --sans: 'Inter', system-ui, sans-serif;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: var(--sans);
+            min-height: 100vh;
+            display: flex;
+            font-size: 13px;
+        }
+
+        /* Sidebar (identical) */
+        .sidebar {
+            width: 230px;
+            background: var(--panel);
+            border-right: 1px solid var(--border);
+            position: fixed;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .brand {
+            padding: 20px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .brand-mark {
+            width: 32px;
+            height: 32px;
+            background: var(--bg);
+            border: 1px solid var(--green);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: var(--mono);
+            font-weight: 700;
+            color: var(--green);
+            font-size: 14px;
+        }
+
+        .brand-text .name {
+            font-family: var(--mono);
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--text);
+            letter-spacing: 0.5px;
+        }
+
+        .brand-text .sub {
+            font-family: var(--mono);
+            font-size: 9px;
+            color: var(--text-mute);
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+        }
+
+        .status-line {
+            padding: 12px 20px;
+            background: var(--panel-2);
+            border-bottom: 1px solid var(--border);
+            font-family: var(--mono);
+            font-size: 10px;
+            color: var(--text-dim);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .status-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--green);
+            box-shadow: 0 0 6px var(--green);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.4;
+            }
+        }
+
+        .nav-section {
+            padding: 15px 0;
+            flex: 1;
+        }
+
+        .nav-label {
+            padding: 8px 20px;
+            font-family: var(--mono);
+            font-size: 9px;
+            color: var(--text-mute);
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            margin-top: 10px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 9px 20px;
+            color: var(--text-dim);
+            text-decoration: none;
+            font-family: var(--mono);
+            font-size: 12px;
+            border-left: 2px solid transparent;
+        }
+
+        .nav-item:hover {
+            background: var(--panel-2);
+            color: var(--text);
+            border-left-color: var(--border-light);
+        }
+
+        .nav-item.active {
+            background: var(--panel-2);
+            color: var(--green);
+            border-left-color: var(--green);
+        }
+
+        .nav-item .marker {
+            color: var(--text-mute);
+            font-size: 11px;
+            width: 12px;
+        }
+
+        .nav-item.active .marker {
+            color: var(--green);
+        }
+
+        .user-block {
+            border-top: 1px solid var(--border);
+            padding: 15px 20px;
+            font-family: var(--mono);
+        }
+
+        .user-block .row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 10px;
+            color: var(--text-mute);
+            margin-bottom: 4px;
+        }
+
+        .user-block .username {
+            color: var(--cyan);
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .user-block .logout {
+            color: var(--red);
+            text-decoration: none;
+            font-size: 10px;
+            border: 1px solid var(--red);
+            padding: 3px 8px;
+            margin-top: 8px;
+            display: inline-block;
+        }
+
+        .user-block .logout:hover {
+            background: var(--red);
+            color: var(--bg);
+        }
+
+        /* Main */
+        .main {
+            margin-left: 230px;
+            flex: 1;
+        }
+
+        .topbar {
+            padding: 15px 30px;
+            border-bottom: 1px solid var(--border);
+            background: var(--panel);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .breadcrumb {
+            font-family: var(--mono);
+            font-size: 11px;
+            color: var(--text-dim);
+        }
+
+        .breadcrumb .slash {
+            color: var(--text-mute);
+            margin: 0 6px;
+        }
+
+        .breadcrumb .current {
+            color: var(--green);
+        }
+
+        .topbar .meta {
+            font-family: var(--mono);
+            font-size: 11px;
+            color: var(--text-dim);
+            display: flex;
+            gap: 20px;
+        }
+
+        .topbar .meta .val {
+            color: var(--cyan);
+        }
+
+        .content {
+            padding: 25px 30px;
+        }
+
+        .page-title {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-bottom: 20px;
+        }
+
+        .page-title h1 {
+            font-family: var(--mono);
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        .page-title h1 .prefix {
+            color: var(--green);
+            margin-right: 6px;
+        }
+
+        .page-title .desc {
+            color: var(--text-mute);
+            font-size: 11px;
+            margin-top: 3px;
+            font-family: var(--mono);
+        }
+
+        /* ML Model Info */
+        .model-bar {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1px;
+            background: var(--border);
+            border: 1px solid var(--border);
+            margin-bottom: 20px;
+        }
+
+        .model-cell {
+            background: var(--panel);
+            padding: 14px 18px;
+        }
+
+        .model-cell .lbl {
+            font-family: var(--mono);
+            font-size: 9px;
+            color: var(--text-mute);
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            margin-bottom: 4px;
+        }
+
+        .model-cell .val {
+            font-family: var(--mono);
+            font-size: 15px;
+            color: var(--text);
+            font-weight: 500;
+        }
+
+        .model-cell .val.acc {
+            color: var(--green);
+        }
+
+        .model-cell .val.cyan {
+            color: var(--cyan);
+        }
+
+        /* Stats */
+        .stats-bar {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1px;
+            background: var(--border);
+            border: 1px solid var(--border);
+            margin-bottom: 20px;
+        }
+
+        .stat-cell {
+            background: var(--panel);
+            padding: 16px 20px;
+        }
+
+        .stat-cell .lbl {
+            font-family: var(--mono);
+            font-size: 10px;
+            color: var(--text-mute);
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            margin-bottom: 6px;
+        }
+
+        .stat-cell .val {
+            font-family: var(--mono);
+            font-size: 24px;
+            font-weight: 500;
+        }
+
+        .stat-cell .val.g {
+            color: var(--green);
+        }
+
+        .stat-cell .val.a {
+            color: var(--amber);
+        }
+
+        .stat-cell .val.r {
+            color: var(--red);
+        }
+
+        /* Simulator */
+        .sim-panel {
+            border: 1px solid var(--border);
+            background: var(--panel);
+            margin-bottom: 20px;
+        }
+
+        .sim-head {
+            padding: 12px 18px;
+            border-bottom: 1px solid var(--border);
+            background: var(--panel-2);
+            font-family: var(--mono);
+            font-size: 11px;
+            color: var(--text);
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .sim-head::before {
+            content: '▸ ';
+            color: var(--green);
+        }
+
+        .sim-head .info {
+            color: var(--text-mute);
+            text-transform: none;
+            letter-spacing: 0;
+        }
+
+        .sim-buttons {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 1px;
+            background: var(--border);
+        }
+
+        .sim-btn {
+            background: var(--panel);
+            padding: 20px 15px;
+            cursor: pointer;
+            font-family: var(--mono);
+            text-align: left;
+            transition: all 0.15s;
+            border: none;
+            color: inherit;
+        }
+
+        .sim-btn:hover {
+            background: var(--panel-2);
+        }
+
+        .sim-btn .cmd {
+            font-size: 10px;
+            color: var(--text-mute);
+            margin-bottom: 6px;
+        }
+
+        .sim-btn .cmd::before {
+            content: '$ ';
+            color: var(--green);
+        }
+
+        .sim-btn .label {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
+        }
+
+        .sim-btn.normal .label {
+            color: var(--green);
+        }
+
+        .sim-btn.dos .label {
+            color: var(--red);
+        }
+
+        .sim-btn.probe .label {
+            color: var(--amber);
+        }
+
+        .sim-btn.r2l .label {
+            color: var(--blue);
+        }
+
+        .sim-btn.u2r .label {
+            color: var(--purple);
+        }
+
+        .sim-btn .desc {
+            font-size: 10px;
+            color: var(--text-mute);
+        }
+
+        /* Result */
+        .result-panel {
+            border: 1px solid var(--border);
+            background: var(--panel);
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .result-panel.show {
+            display: block;
+        }
+
+        .result-panel.attack {
+            border-color: var(--red);
+        }
+
+        .result-panel.safe {
+            border-color: var(--green);
+        }
+
+        .result-head {
+            padding: 14px 18px;
+            border-bottom: 1px solid var(--border);
+            background: var(--panel-2);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .result-title {
+            font-family: var(--mono);
+            font-size: 14px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .result-title::before {
+            content: '▸ ';
+            color: var(--green);
+        }
+
+        .result-panel.attack .result-title {
+            color: var(--red);
+        }
+
+        .result-panel.attack .result-title::before {
+            color: var(--red);
+        }
+
+        .result-panel.safe .result-title {
+            color: var(--green);
+        }
+
+        .badge {
+            font-family: var(--mono);
+            font-size: 10px;
+            padding: 4px 10px;
+            border: 1px solid;
+            letter-spacing: 1px;
+            font-weight: 600;
+        }
+
+        .badge-normal {
+            color: var(--green);
+            border-color: var(--green);
+        }
+
+        .badge-low {
+            color: var(--amber);
+            border-color: var(--amber);
+        }
+
+        .badge-high {
+            color: var(--red);
+            border-color: var(--red);
+        }
+
+        .result-body {
+            padding: 20px;
+        }
+
+        /* Ensemble Cards */
+        .ensemble-row {
+            display: grid;
+            grid-template-columns: auto 1fr auto;
+            gap: 18px;
+            align-items: center;
+            padding: 14px 18px;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            margin-bottom: 18px;
+        }
+
+        .ensemble-row .lbl {
+            font-family: var(--mono);
+            font-size: 11px;
+            color: var(--text-mute);
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+        }
+
+        .ensemble-row .val {
+            font-family: var(--mono);
+            font-size: 12px;
+            color: var(--text);
+        }
+
+        .agreement {
+            font-family: var(--mono);
+            font-size: 11px;
+            padding: 5px 12px;
+            border: 1px solid;
+            font-weight: 600;
+        }
+
+        .agreement.full {
+            color: var(--green);
+            border-color: var(--green);
+        }
+
+        .agreement.partial {
+            color: var(--amber);
+            border-color: var(--amber);
+        }
+
+        .models {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1px;
+            background: var(--border);
+            border: 1px solid var(--border);
+            margin-bottom: 20px;
+        }
+
+        .model-card {
+            background: var(--panel);
+            padding: 16px 18px;
+        }
+
+        .model-card .model-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 12px;
+        }
+
+        .model-card .model-name {
+            font-family: var(--mono);
+            font-size: 12px;
+            color: var(--text);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .model-card .verdict {
+            font-family: var(--mono);
+            font-size: 11px;
+            padding: 3px 10px;
+            border: 1px solid;
+            font-weight: 600;
+        }
+
+        .verdict.threat {
+            color: var(--red);
+            border-color: var(--red);
+        }
+
+        .verdict.safe {
+            color: var(--green);
+            border-color: var(--green);
+        }
+
+        .model-details {
+            font-family: var(--mono);
+            font-size: 11px;
+            color: var(--text-dim);
+            line-height: 1.9;
+        }
+
+        .model-details .k {
+            color: var(--text-mute);
+            display: inline-block;
+            width: 90px;
+        }
+
+        .model-details .v {
+            color: var(--cyan);
+            font-weight: 600;
+        }
+
+        /* SHAP */
+        .shap-panel {
+            border: 1px solid var(--border);
+            background: var(--bg);
+            padding: 18px;
+        }
+
+        .shap-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 14px;
+        }
+
+        .shap-title {
+            font-family: var(--mono);
+            font-size: 12px;
+            color: var(--text);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+        }
+
+        .shap-title::before {
+            content: '▸ ';
+            color: var(--purple);
+        }
+
+        .shap-note {
+            font-family: var(--mono);
+            font-size: 10px;
+            color: var(--text-mute);
+        }
+
+        .shap-feat {
+            padding: 10px 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .shap-feat:last-child {
+            border-bottom: none;
+        }
+
+        .shap-top {
+            display: grid;
+            grid-template-columns: 30px 1fr auto;
+            gap: 14px;
+            align-items: center;
+            margin-bottom: 6px;
+        }
+
+        .shap-rank {
+            font-family: var(--mono);
+            font-size: 11px;
+            color: var(--text-mute);
+            text-align: right;
+        }
+
+        .shap-info .name {
+            font-family: var(--mono);
+            font-size: 12px;
+            color: var(--text);
+            font-weight: 500;
+        }
+
+        .shap-info .meta {
+            font-family: var(--mono);
+            font-size: 10px;
+            color: var(--text-mute);
+            margin-top: 2px;
+        }
+
+        .shap-info .meta .code {
+            color: var(--amber);
+        }
+
+        .shap-impact {
+            font-family: var(--mono);
+            font-size: 12px;
+            font-weight: 700;
+            padding: 3px 10px;
+            border: 1px solid;
+        }
+
+        .shap-impact.up {
+            color: var(--red);
+            border-color: var(--red);
+        }
+
+        .shap-impact.down {
+            color: var(--green);
+            border-color: var(--green);
+        }
+
+        .shap-bar {
+            height: 3px;
+            background: var(--border);
+            margin-left: 44px;
+        }
+
+        .shap-fill {
+            height: 100%;
+        }
+
+        .shap-fill.up {
+            background: var(--red);
+        }
+
+        .shap-fill.down {
+            background: var(--green);
+        }
+
+        .shap-footer {
+            margin-top: 14px;
+            padding: 10px 12px;
+            background: var(--panel-2);
+            border-left: 2px solid var(--purple);
+            font-family: var(--mono);
+            font-size: 10px;
+            color: var(--text-dim);
+        }
+
+        .shap-footer::before {
+            content: '[i] ';
+            color: var(--purple);
+        }
+
+        /* Event log */
+        .event-log {
+            font-family: var(--mono);
+            font-size: 11px;
+        }
+
+        .event-row {
+            padding: 8px 18px;
+            display: grid;
+            grid-template-columns: 130px 55px 90px 1fr;
+            gap: 12px;
+            border-bottom: 1px solid var(--border);
+            align-items: center;
+        }
+
+        .event-row:hover {
+            background: var(--panel-2);
+        }
+
+        .event-row:last-child {
+            border-bottom: none;
+        }
+
+        .event-time {
+            color: var(--text-mute);
+            font-size: 10px;
+        }
+
+        .event-level {
+            font-size: 9px;
+            padding: 2px 6px;
+            text-align: center;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        .lvl-normal {
+            color: var(--green);
+            border: 1px solid var(--green);
+        }
+
+        .lvl-low {
+            color: var(--amber);
+            border: 1px solid var(--amber);
+        }
+
+        .lvl-high {
+            color: var(--red);
+            border: 1px solid var(--red);
+        }
+
+        .event-user {
+            color: var(--cyan);
+            font-size: 10px;
+        }
+
+        .event-action {
+            color: var(--text);
+            font-size: 11px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .empty {
+            padding: 40px 20px;
+            text-align: center;
+            font-family: var(--mono);
+            font-size: 11px;
+            color: var(--text-mute);
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border: 2px solid var(--border);
+            border-top-color: var(--green);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .loading {
+            font-family: var(--mono);
+            font-size: 12px;
+            color: var(--text-dim);
+            text-align: center;
+            padding: 30px;
+        }
+
+        .loading::before {
+            content: '[⟳] ';
+            color: var(--green);
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="brand">
+            <div class="brand-mark">CS</div>
+            <div class="brand-text">
+                <div class="name">CLOUDSHIELD</div>
+                <div class="sub">SOC v1.0</div>
+            </div>
+        </div>
+        <div class="status-line">
+            <div class="status-dot"></div>
+            <span>SYSTEM · OPERATIONAL</span>
+        </div>
+        <div class="nav-section">
+            <div class="nav-label">─ CONSOLE</div>
+            <a href="{{ url_for('dashboard') }}" class="nav-item">
+                <span class="marker">▸</span><span>Overview</span>
+            </a>
+            <a href="{{ url_for('vault') }}" class="nav-item">
+                <span class="marker">▸</span><span>Cipher Vault</span>
+            </a>
+            <a href="{{ url_for('ids_dashboard') }}" class="nav-item active">
+                <span class="marker">▸</span><span>Threat Monitor</span>
+            </a>
+            <div class="nav-label">─ SECURITY</div>
+            <a href="{{ url_for('auth_log') }}" class="nav-item">
+                <span class="marker">▸</span><span>Auth Log</span>
+            </a>
+            <a href="{{ url_for('event_log') }}" class="nav-item">
+                <span class="marker">▸</span><span>Event Log</span>
+            </a>
+        </div>
+        <div class="user-block">
+            <div class="row"><span>OPERATOR</span><span>SESSION</span></div>
+            <div class="row"><span class="username">{{ username }}</span><span style="color:var(--green);">ACTIVE</span>
+            </div>
+            <a href="{{ url_for('logout') }}" class="logout">[ TERMINATE ]</a>
+        </div>
+    </div>
+
+    <!-- Main -->
+    <div class="main">
+        <div class="topbar">
+            <div class="breadcrumb">
+                /cloudshield <span class="slash">/</span>
+                <span class="current">threat_monitor</span>
+            </div>
+            <div class="meta">
+                <div>USER: <span class="val">{{ username }}</span></div>
+                <div>ENSEMBLE: <span class="val">RF + AE</span></div>
+                <div>SHAP: <span class="val">ENABLED</span></div>
+            </div>
+        </div>
+
+        <div class="content">
+
+            <div class="page-title">
+                <div>
+                    <h1><span class="prefix">$</span>threat_monitor --live</h1>
+                    <div class="desc">
+                        Real-time threat detection · listening on port 5000 ·
+                        <span style="color: var(--green);">● monitoring active</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ML Model Info -->
+            <div class="model-bar">
+                <div class="model-cell">
+                    <div class="lbl">MODEL_A · RF</div>
+                    <div class="val acc">{{ '%.2f' % (metadata.accuracy * 100) }}%</div>
+                </div>
+                <div class="model-cell">
+                    <div class="lbl">MODEL_B · AE</div>
+                    <div class="val acc">{{ '%.2f' % (ae_metadata.overall_accuracy * 100) }}%</div>
+                </div>
+                <div class="model-cell">
+                    <div class="lbl">FEATURES</div>
+                    <div class="val cyan">{{ metadata.n_features }}</div>
+                </div>
+                <div class="model-cell">
+                    <div class="lbl">TRAINING SAMPLES</div>
+                    <div class="val cyan">{{ '{:,}'.format(metadata.n_training_samples) }}</div>
+                </div>
+            </div>
+
+            <!-- Stats -->
+            <div class="stats-bar">
+                <div class="stat-cell">
+                    <div class="lbl">NORMAL · TRAFFIC</div>
+                    <div class="val g">{{ '%03d' % stats.Normal }}</div>
+                </div>
+                <div class="stat-cell">
+                    <div class="lbl">LOW · THREATS</div>
+                    <div class="val a">{{ '%03d' % stats.Low }}</div>
+                </div>
+                <div class="stat-cell">
+                    <div class="lbl">HIGH · THREATS</div>
+                    <div class="val r">{{ '%03d' % stats.High }}</div>
+                </div>
+            </div>
+
+            <!-- LIVE Event Log -->
+            <div class="sim-panel">
+                <div class="sim-head">
+                    LIVE THREAT FEED
+                    <span class="info">
+                        <span id="feedStatus" style="color: var(--green);">● LIVE</span>
+                        · auto-refresh: 2s · last 20 events
+                    </span>
+                </div>
+                <div class="event-log" id="liveFeed">
+                    {% if logs %}
+                    {% for log in logs %}
+                    <div class="event-row" data-id="{{ log['id'] }}">
+                        <div class="event-time">{{ log['timestamp'] }}</div>
+                        <div class="event-level lvl-{{ log['threat_level']|lower }}">
+                            {{ log['threat_level']|upper }}
+                        </div>
+                        <div class="event-user">{{ log['username'] }}</div>
+                        <div class="event-action">{{ log['action'] }}</div>
+                    </div>
+                    {% endfor %}
+                    {% else %}
+                    <div class="empty" id="emptyMsg">
+                        // awaiting incoming events · connect red-team console at :5001 //
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <script>
+                // ═════ LIVE FEED POLLER ═════
+                let lastEventId = 0;
+
+                // Initialize last event ID from server-rendered rows
+                document.querySelectorAll('.event-row').forEach(row => {
+                    const id = parseInt(row.dataset.id);
+                    if (id > lastEventId) lastEventId = id;
+                });
+
+                // Flash animation for new events
+                function flashNewEvent(row) {
+                    row.style.transition = 'background-color 0.4s';
+                    row.style.backgroundColor = 'rgba(74, 222, 128, 0.15)';
+                    setTimeout(() => {
+                        row.style.backgroundColor = '';
+                    }, 1200);
+                }
+
+                // Build event row HTML
+                function buildRow(event) {
+                    const lvlClass = event.threat_level.toLowerCase();
+                    const lvlText = event.threat_level.toUpperCase();
+                    return `
+            <div class="event-row" data-id="${event.id}">
+                <div class="event-time">${event.timestamp}</div>
+                <div class="event-level lvl-${lvlClass}">${lvlText}</div>
+                <div class="event-user">${event.username}</div>
+                <div class="event-action">${event.action}</div>
+            </div>
+        `;
+                }
+
+                // Poll live feed
+                async function pollFeed() {
+                    try {
+                        const response = await fetch('/api/live-feed');
+                        const data = await response.json();
+
+                        if (!data.events || data.events.length === 0) return;
+
+                        const newestId = data.events[0].id;
+
+                        // Only update if there are new events
+                        if (newestId > lastEventId) {
+                            const feed = document.getElementById('liveFeed');
+
+                            // Remove empty message if present
+                            const emptyMsg = document.getElementById('emptyMsg');
+                            if (emptyMsg) emptyMsg.remove();
+
+                            // Get only NEW events (id > lastEventId)
+                            const newEvents = data.events.filter(e => e.id > lastEventId);
+
+                            // Prepend new events at the top (reverse to keep order)
+                            newEvents.reverse().forEach(event => {
+                                feed.insertAdjacentHTML('afterbegin', buildRow(event));
+                                flashNewEvent(feed.firstElementChild);
+                            });
+
+                            // Remove excess rows (keep max 20)
+                            const rows = feed.querySelectorAll('.event-row');
+                            if (rows.length > 20) {
+                                for (let i = 20; i < rows.length; i++) {
+                                    rows[i].remove();
+                                }
+                            }
+
+                            lastEventId = newestId;
+
+                            // Flash the LIVE indicator
+                            const status = document.getElementById('feedStatus');
+                            status.style.color = '#fbbf24';
+                            setTimeout(() => {
+                                status.style.color = 'var(--green)';
+                            }, 300);
+                        }
+                    } catch (e) {
+                        const status = document.getElementById('feedStatus');
+                        status.style.color = 'var(--red)';
+                        status.textContent = '● OFFLINE';
+                    }
+                }
+
+                // Poll every 2 seconds
+                setInterval(pollFeed, 2000);
+            </script>
+</body>
+
+</html>

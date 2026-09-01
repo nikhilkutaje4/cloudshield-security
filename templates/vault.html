@@ -1,0 +1,973 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>CloudShield · Cipher Vault</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg: #0a0f14;
+            --panel: #0f1519;
+            --panel-2: #131a20;
+            --border: #1a2530;
+            --border-light: #243040;
+            --text: #c9d1d9;
+            --text-dim: #8b949e;
+            --text-mute: #4b5563;
+            --green: #4ade80;
+            --amber: #fbbf24;
+            --red: #f87171;
+            --cyan: #67e8f9;
+            --blue: #60a5fa;
+            --purple: #c084fc;
+            --mono: 'JetBrains Mono', 'Courier New', monospace;
+            --sans: 'Inter', system-ui, sans-serif;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: var(--sans);
+            min-height: 100vh;
+            display: flex;
+            font-size: 13px;
+        }
+
+        /* Sidebar (identical to dashboard) */
+        .sidebar {
+            width: 230px;
+            background: var(--panel);
+            border-right: 1px solid var(--border);
+            position: fixed;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .brand {
+            padding: 20px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .brand-mark {
+            width: 32px;
+            height: 32px;
+            background: var(--bg);
+            border: 1px solid var(--green);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: var(--mono);
+            font-weight: 700;
+            color: var(--green);
+            font-size: 14px;
+        }
+
+        .brand-text .name {
+            font-family: var(--mono);
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--text);
+            letter-spacing: 0.5px;
+        }
+
+        .brand-text .sub {
+            font-family: var(--mono);
+            font-size: 9px;
+            color: var(--text-mute);
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+        }
+
+        .status-line {
+            padding: 12px 20px;
+            background: var(--panel-2);
+            border-bottom: 1px solid var(--border);
+            font-family: var(--mono);
+            font-size: 10px;
+            color: var(--text-dim);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .status-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--green);
+            box-shadow: 0 0 6px var(--green);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.4;
+            }
+        }
+
+        .nav-section {
+            padding: 15px 0;
+            flex: 1;
+        }
+
+        .nav-label {
+            padding: 8px 20px;
+            font-family: var(--mono);
+            font-size: 9px;
+            color: var(--text-mute);
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            margin-top: 10px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 9px 20px;
+            color: var(--text-dim);
+            text-decoration: none;
+            font-family: var(--mono);
+            font-size: 12px;
+            border-left: 2px solid transparent;
+        }
+
+        .nav-item:hover {
+            background: var(--panel-2);
+            color: var(--text);
+            border-left-color: var(--border-light);
+        }
+
+        .nav-item.active {
+            background: var(--panel-2);
+            color: var(--green);
+            border-left-color: var(--green);
+        }
+
+        .nav-item .marker {
+            color: var(--text-mute);
+            font-size: 11px;
+            width: 12px;
+        }
+
+        .nav-item.active .marker {
+            color: var(--green);
+        }
+
+        .user-block {
+            border-top: 1px solid var(--border);
+            padding: 15px 20px;
+            font-family: var(--mono);
+        }
+
+        .user-block .row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 10px;
+            color: var(--text-mute);
+            margin-bottom: 4px;
+        }
+
+        .user-block .username {
+            color: var(--cyan);
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .user-block .logout {
+            color: var(--red);
+            text-decoration: none;
+            font-size: 10px;
+            border: 1px solid var(--red);
+            padding: 3px 8px;
+            margin-top: 8px;
+            display: inline-block;
+        }
+
+        .user-block .logout:hover {
+            background: var(--red);
+            color: var(--bg);
+        }
+
+        /* Main */
+        .main {
+            margin-left: 230px;
+            flex: 1;
+        }
+
+        .topbar {
+            padding: 15px 30px;
+            border-bottom: 1px solid var(--border);
+            background: var(--panel);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .breadcrumb {
+            font-family: var(--mono);
+            font-size: 11px;
+            color: var(--text-dim);
+        }
+
+        .breadcrumb .slash {
+            color: var(--text-mute);
+            margin: 0 6px;
+        }
+
+        .breadcrumb .current {
+            color: var(--green);
+        }
+
+        .topbar .meta {
+            font-family: var(--mono);
+            font-size: 11px;
+            color: var(--text-dim);
+            display: flex;
+            gap: 20px;
+        }
+
+        .topbar .meta .val {
+            color: var(--cyan);
+        }
+
+        .content {
+            padding: 25px 30px;
+        }
+
+        .page-title {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-bottom: 20px;
+        }
+
+        .page-title h1 {
+            font-family: var(--mono);
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        .page-title h1 .prefix {
+            color: var(--green);
+            margin-right: 6px;
+        }
+
+        .page-title .desc {
+            color: var(--text-mute);
+            font-size: 11px;
+            margin-top: 3px;
+            font-family: var(--mono);
+        }
+
+        .add-btn {
+            padding: 8px 16px;
+            background: var(--bg);
+            color: var(--green);
+            border: 1px solid var(--green);
+            font-family: var(--mono);
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .add-btn:hover {
+            background: var(--green);
+            color: var(--bg);
+        }
+
+        /* Algorithm registry panel */
+        .algo-registry {
+            border: 1px solid var(--border);
+            background: var(--panel);
+            margin-bottom: 20px;
+        }
+
+        .registry-head {
+            padding: 12px 18px;
+            border-bottom: 1px solid var(--border);
+            background: var(--panel-2);
+            font-family: var(--mono);
+            font-size: 11px;
+            color: var(--text);
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .registry-head::before {
+            content: '▸ ';
+            color: var(--green);
+        }
+
+        .registry-head .info {
+            color: var(--text-mute);
+            text-transform: none;
+            letter-spacing: 0;
+            font-weight: 400;
+        }
+
+        .registry-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1px;
+            background: var(--border);
+        }
+
+        .algo-cell {
+            background: var(--panel);
+            padding: 14px 18px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .algo-cell .left .name {
+            font-family: var(--mono);
+            font-size: 12px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .algo-cell .left .name::before {
+            content: '■';
+            font-size: 10px;
+        }
+
+        .algo-cell .left .use {
+            font-family: var(--mono);
+            font-size: 10px;
+            color: var(--text-mute);
+            margin-top: 3px;
+            padding-left: 14px;
+        }
+
+        .algo-cell .count {
+            font-family: var(--mono);
+            font-size: 22px;
+            color: var(--text);
+            font-weight: 500;
+        }
+
+        .algo-cell.aes128 .name {
+            color: var(--green);
+        }
+
+        .algo-cell.aes256 .name {
+            color: var(--blue);
+        }
+
+        .algo-cell.ecc .name {
+            color: var(--amber);
+        }
+
+        .algo-cell.kyber .name {
+            color: var(--red);
+        }
+
+        /* Flash */
+        .flash {
+            padding: 12px 18px;
+            font-family: var(--mono);
+            font-size: 11px;
+            margin-bottom: 20px;
+            border-left: 3px solid var(--green);
+            background: rgba(74, 222, 128, 0.05);
+            color: var(--green);
+        }
+
+        .flash::before {
+            content: '[✓] ';
+        }
+
+        /* Vault items table */
+        .vault-panel {
+            border: 1px solid var(--border);
+            background: var(--panel);
+        }
+
+        .vault-head {
+            padding: 12px 18px;
+            border-bottom: 1px solid var(--border);
+            background: var(--panel-2);
+            font-family: var(--mono);
+            font-size: 11px;
+            color: var(--text);
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+        }
+
+        .vault-head::before {
+            content: '▸ ';
+            color: var(--green);
+        }
+
+        .vault-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-family: var(--mono);
+            font-size: 11px;
+        }
+
+        .vault-table th {
+            text-align: left;
+            padding: 10px 18px;
+            font-size: 9px;
+            font-weight: 600;
+            color: var(--text-mute);
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            border-bottom: 1px solid var(--border);
+            background: var(--bg);
+        }
+
+        .vault-table td {
+            padding: 12px 18px;
+            border-bottom: 1px solid var(--border);
+            color: var(--text);
+            vertical-align: middle;
+        }
+
+        .vault-table tr:hover td {
+            background: var(--panel-2);
+        }
+
+        .vault-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .item-id {
+            color: var(--text-mute);
+            font-size: 10px;
+        }
+
+        .item-title {
+            color: var(--text);
+            font-weight: 600;
+        }
+
+        .item-cat {
+            display: inline-block;
+            font-size: 9px;
+            padding: 2px 7px;
+            border: 1px solid var(--border-light);
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .algo-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 10px;
+            padding: 3px 8px;
+            border: 1px solid;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        .algo-tag.aes128 {
+            color: var(--green);
+            border-color: var(--green);
+        }
+
+        .algo-tag.aes256 {
+            color: var(--blue);
+            border-color: var(--blue);
+        }
+
+        .algo-tag.ecc {
+            color: var(--amber);
+            border-color: var(--amber);
+        }
+
+        .algo-tag.kyber {
+            color: var(--red);
+            border-color: var(--red);
+        }
+
+        .algo-tag::before {
+            content: '●';
+            font-size: 8px;
+        }
+
+        .risk-score {
+            font-family: var(--mono);
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        .risk-low {
+            color: var(--green);
+        }
+
+        .risk-med {
+            color: var(--amber);
+        }
+
+        .risk-high {
+            color: var(--red);
+        }
+
+        .ciphertext {
+            font-family: var(--mono);
+            font-size: 10px;
+            color: var(--text-mute);
+            max-width: 250px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            display: block;
+        }
+
+        .plaintext {
+            font-family: var(--mono);
+            font-size: 11px;
+            color: var(--cyan);
+            max-width: 250px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            display: block;
+        }
+
+        .plaintext.hidden {
+            color: transparent;
+            text-shadow: 0 0 6px rgba(103, 232, 249, 0.5);
+            user-select: none;
+        }
+
+        .action-btns {
+            display: flex;
+            gap: 6px;
+        }
+
+        .btn-icon {
+            font-family: var(--mono);
+            font-size: 10px;
+            padding: 4px 10px;
+            background: transparent;
+            border: 1px solid var(--border-light);
+            color: var(--text-dim);
+            cursor: pointer;
+            text-decoration: none;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-icon:hover {
+            border-color: var(--cyan);
+            color: var(--cyan);
+        }
+
+        .btn-icon.del:hover {
+            border-color: var(--red);
+            color: var(--red);
+        }
+
+        .empty-state {
+            padding: 60px 20px;
+            text-align: center;
+            font-family: var(--mono);
+            font-size: 12px;
+            color: var(--text-mute);
+        }
+
+        .empty-state .prompt {
+            color: var(--green);
+        }
+
+        /* Modal */
+        .modal-bg {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(10, 15, 20, 0.8);
+            backdrop-filter: blur(4px);
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+        }
+
+        .modal-bg.active {
+            display: flex;
+        }
+
+        .modal {
+            background: var(--panel);
+            border: 1px solid var(--border-light);
+            width: 480px;
+            font-family: var(--mono);
+        }
+
+        .modal-head {
+            padding: 12px 18px;
+            background: var(--panel-2);
+            border-bottom: 1px solid var(--border);
+            font-size: 11px;
+            color: var(--green);
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+        }
+
+        .modal-head::before {
+            content: '▸ ';
+        }
+
+        .modal-body {
+            padding: 20px 18px;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-group label {
+            display: block;
+            font-family: var(--mono);
+            font-size: 10px;
+            color: var(--text-mute);
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+        }
+
+        .form-group label::before {
+            content: '> ';
+            color: var(--green);
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 10px 12px;
+            background: var(--bg);
+            border: 1px solid var(--border-light);
+            color: var(--text);
+            font-family: var(--mono);
+            font-size: 12px;
+            outline: none;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            border-color: var(--green);
+        }
+
+        .form-group textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .form-note {
+            padding: 10px 12px;
+            background: var(--bg);
+            border-left: 2px solid var(--cyan);
+            font-family: var(--mono);
+            font-size: 10px;
+            color: var(--text-dim);
+            margin: 16px 0;
+        }
+
+        .form-note::before {
+            content: '[i] ';
+            color: var(--cyan);
+        }
+
+        .modal-btns {
+            display: flex;
+            gap: 10px;
+            margin-top: 16px;
+        }
+
+        .btn-primary,
+        .btn-secondary {
+            flex: 1;
+            padding: 10px;
+            font-family: var(--mono);
+            font-size: 11px;
+            font-weight: 600;
+            border: 1px solid;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn-primary {
+            background: var(--bg);
+            color: var(--green);
+            border-color: var(--green);
+        }
+
+        .btn-primary:hover {
+            background: var(--green);
+            color: var(--bg);
+        }
+
+        .btn-secondary {
+            background: var(--bg);
+            color: var(--text-mute);
+            border-color: var(--border-light);
+        }
+
+        .btn-secondary:hover {
+            color: var(--text);
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="brand">
+            <div class="brand-mark">CS</div>
+            <div class="brand-text">
+                <div class="name">CLOUDSHIELD</div>
+                <div class="sub">SOC v1.0</div>
+            </div>
+        </div>
+        <div class="status-line">
+            <div class="status-dot"></div>
+            <span>SYSTEM · OPERATIONAL</span>
+        </div>
+        <div class="nav-section">
+            <div class="nav-label">─ CONSOLE</div>
+            <a href="{{ url_for('dashboard') }}" class="nav-item">
+                <span class="marker">▸</span><span>Overview</span>
+            </a>
+            <a href="{{ url_for('vault') }}" class="nav-item active">
+                <span class="marker">▸</span><span>Cipher Vault</span>
+            </a>
+            <a href="{{ url_for('ids_dashboard') }}" class="nav-item">
+                <span class="marker">▸</span><span>Threat Monitor</span>
+            </a>
+            <div class="nav-label">─ SECURITY</div>
+            <a href="{{ url_for('auth_log') }}" class="nav-item">
+                <span class="marker">▸</span><span>Auth Log</span>
+            </a>
+            <a href="{{ url_for('event_log') }}" class="nav-item">
+                <span class="marker">▸</span><span>Event Log</span>
+            </a>
+        </div>
+        <div class="user-block">
+            <div class="row"><span>OPERATOR</span><span>SESSION</span></div>
+            <div class="row"><span class="username">{{ username }}</span><span style="color:var(--green);">ACTIVE</span>
+            </div>
+            <a href="{{ url_for('logout') }}" class="logout">[ TERMINATE ]</a>
+        </div>
+    </div>
+
+    <!-- Main -->
+    <div class="main">
+        <div class="topbar">
+            <div class="breadcrumb">
+                /cloudshield <span class="slash">/</span>
+                <span class="current">cipher_vault</span>
+            </div>
+            <div class="meta">
+                <div>USER: <span class="val">{{ username }}</span></div>
+                <div>ITEMS: <span class="val">{{ items|length }}</span></div>
+                <div>ENGINE: <span class="val">ADAPTIVE</span></div>
+            </div>
+        </div>
+
+        <div class="content">
+
+            <div class="page-title">
+                <div>
+                    <h1><span class="prefix">$</span>cipher_vault --list</h1>
+                    <div class="desc">ML-driven encryption · Post-quantum ready</div>
+                </div>
+                <button class="add-btn" onclick="openModal()">[ + NEW ENTRY ]</button>
+            </div>
+
+            {% with messages = get_flashed_messages(with_categories=true) %}
+            {% for category, message in messages %}
+            <div class="flash">{{ message }}</div>
+            {% endfor %}
+            {% endwith %}
+
+            <!-- Algorithm Registry -->
+            <div class="algo-registry">
+                <div class="registry-head">
+                    ALGORITHM REGISTRY
+                    <span class="info">ml-selected · context-aware</span>
+                </div>
+                <div class="registry-grid">
+                    <div class="algo-cell aes128">
+                        <div class="left">
+                            <div class="name">AES-128-GCM</div>
+                            <div class="use">symmetric · general</div>
+                        </div>
+                        <div class="count">{{ '%03d' % algo_counts.get('AES-128-GCM', 0) }}</div>
+                    </div>
+                    <div class="algo-cell aes256">
+                        <div class="left">
+                            <div class="name">AES-256-GCM</div>
+                            <div class="use">symmetric · strong</div>
+                        </div>
+                        <div class="count">{{ '%03d' % algo_counts.get('AES-256-GCM', 0) }}</div>
+                    </div>
+                    <div class="algo-cell ecc">
+                        <div class="left">
+                            <div class="name">ECC-P384</div>
+                            <div class="use">elliptic curve</div>
+                        </div>
+                        <div class="count">{{ '%03d' % algo_counts.get('ECC-P384', 0) }}</div>
+                    </div>
+                    <div class="algo-cell kyber">
+                        <div class="left">
+                            <div class="name">KYBER-512</div>
+                            <div class="use">post-quantum</div>
+                        </div>
+                        <div class="count">{{ '%03d' % algo_counts.get('Kyber-512', 0) }}</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Vault Items -->
+            <div class="vault-panel">
+                <div class="vault-head">ENCRYPTED ENTRIES</div>
+                {% if items %}
+                <table class="vault-table">
+                    <thead>
+                        <tr>
+                            <th style="width:40px;">ID</th>
+                            <th>TITLE</th>
+                            <th>CATEGORY</th>
+                            <th>ALGORITHM</th>
+                            <th style="width:60px;">RISK</th>
+                            <th>PLAINTEXT</th>
+                            <th>CIPHERTEXT</th>
+                            <th style="width:140px;">ACTIONS</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in items %}
+                        <tr>
+                            <td class="item-id">{{ '%03d' % item.id }}</td>
+                            <td class="item-title">{{ item.title }}</td>
+                            <td><span class="item-cat">{{ item.category }}</span></td>
+                            <td>
+                                {% set algo_class = 'aes128' if item.algorithm == 'AES-128-GCM'
+                                else 'aes256' if item.algorithm == 'AES-256-GCM'
+                                else 'ecc' if item.algorithm == 'ECC-P384'
+                                else 'kyber' %}
+                                <span class="algo-tag {{ algo_class }}">{{ item.algorithm }}</span>
+                            </td>
+                            <td>
+                                {% set risk_class = 'risk-low' if item.risk_score < 30 else 'risk-med' if
+                                    item.risk_score < 60 else 'risk-high' %} <span class="risk-score {{ risk_class }}">
+                                    {{ item.risk_score }}</span>
+                            </td>
+                            <td>
+                                <span class="plaintext hidden" id="pt-{{ item.id }}">{{ item.data }}</span>
+                            </td>
+                            <td>
+                                <span class="ciphertext">{{ item.encrypted_preview }}</span>
+                            </td>
+                            <td>
+                                <div class="action-btns">
+                                    <button class="btn-icon" onclick="toggle({{ item.id }}, this)">SHOW</button>
+                                    <a href="{{ url_for('vault_delete', item_id=item.id) }}" class="btn-icon del"
+                                        onclick="return confirm('Delete entry {{ item.id }}?')">DEL</a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                <div class="empty-state">
+                    <span class="prompt">$</span> vault is empty · run <span class="prompt">[ + NEW ENTRY ]</span> to
+                    add
+                </div>
+                {% endif %}
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal-bg" id="modal">
+        <div class="modal">
+            <div class="modal-head">NEW VAULT ENTRY</div>
+            <div class="modal-body">
+                <form method="POST" action="{{ url_for('vault_add') }}">
+                    <div class="form-group">
+                        <label>title</label>
+                        <input type="text" name="title" required placeholder="e.g., prod_db_password">
+                    </div>
+                    <div class="form-group">
+                        <label>category</label>
+                        <select name="category">
+                            <option>General</option>
+                            <option>Note</option>
+                            <option>Password</option>
+                            <option>API Key</option>
+                            <option>Credit Card</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>plaintext_data</label>
+                        <textarea name="data" required placeholder="Enter secret data..."></textarea>
+                    </div>
+                    <div class="form-note">
+                        Adaptive engine will select optimal algorithm based on
+                        sensitivity, current threat level, and system context.
+                    </div>
+                    <div class="modal-btns">
+                        <button type="button" class="btn-secondary" onclick="closeModal()">CANCEL</button>
+                        <button type="submit" class="btn-primary">ENCRYPT &amp; STORE</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function openModal() { document.getElementById('modal').classList.add('active'); }
+        function closeModal() { document.getElementById('modal').classList.remove('active'); }
+        function toggle(id, btn) {
+            const el = document.getElementById('pt-' + id);
+            if (el.classList.contains('hidden')) {
+                el.classList.remove('hidden');
+                btn.textContent = 'HIDE';
+            } else {
+                el.classList.add('hidden');
+                btn.textContent = 'SHOW';
+            }
+        }
+    </script>
+</body>
+
+</html>

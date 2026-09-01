@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>CloudShield · MFA Setup</title>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --bg: #0a0f14; --panel: #0f1519; --panel-2: #131a20;
+            --border: #1a2530; --border-light: #243040;
+            --text: #c9d1d9; --text-dim: #8b949e; --text-mute: #4b5563;
+            --green: #4ade80; --amber: #fbbf24; --cyan: #67e8f9;
+            --mono: 'JetBrains Mono', 'Courier New', monospace;
+            --sans: 'Inter', system-ui, sans-serif;
+        }
+        body {
+            background: var(--bg); color: var(--text); font-family: var(--sans);
+            min-height: 100vh; display: flex; justify-content: center;
+            align-items: center; padding: 20px; font-size: 13px;
+            background-image:
+                linear-gradient(rgba(74,222,128,0.02) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(74,222,128,0.02) 1px, transparent 1px);
+            background-size: 40px 40px;
+        }
+        .container { width: 500px; background: var(--panel); border: 1px solid var(--border); }
+        .head { padding: 20px; border-bottom: 1px solid var(--border); background: var(--panel-2); display: flex; align-items: center; gap: 12px; }
+        .mark { width: 34px; height: 34px; background: var(--bg); border: 1px solid var(--green); display: flex; align-items: center; justify-content: center; font-family: var(--mono); font-weight: 700; color: var(--green); font-size: 14px; }
+        .head .brand { font-family: var(--mono); font-size: 14px; font-weight: 700; color: var(--text); letter-spacing: 0.5px; }
+        .head .sub { font-family: var(--mono); font-size: 9px; color: var(--text-mute); letter-spacing: 1.5px; text-transform: uppercase; margin-top: 2px; }
+        .status-bar { padding: 8px 20px; background: var(--bg); border-bottom: 1px solid var(--border); font-family: var(--mono); font-size: 10px; color: var(--text-mute); display: flex; justify-content: space-between; }
+        .status-bar .ok { color: var(--green); }
+        .status-bar .ok::before { content: '● '; }
+        .body { padding: 24px 20px; }
+        .term-line { font-family: var(--mono); font-size: 12px; color: var(--text); margin-bottom: 16px; }
+        .term-line .prompt { color: var(--green); margin-right: 6px; }
+
+        .instructions {
+            padding: 14px;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            font-family: var(--mono);
+            font-size: 11px;
+            color: var(--text-dim);
+            line-height: 1.9;
+            margin-bottom: 16px;
+        }
+        .instructions .step { display: flex; gap: 8px; }
+        .instructions .step .num { color: var(--green); font-weight: 700; min-width: 22px; }
+
+        .qr-frame {
+            padding: 15px;
+            background: white;
+            display: block;
+            margin: 0 auto 16px;
+            width: fit-content;
+        }
+        .qr-frame img { display: block; }
+
+        .secret-label {
+            font-family: var(--mono);
+            font-size: 10px;
+            color: var(--text-mute);
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            margin-bottom: 6px;
+        }
+        .secret-label::before { content: '> '; color: var(--green); }
+
+        .secret-box {
+            padding: 12px;
+            background: var(--bg);
+            border: 1px dashed var(--border-light);
+            font-family: var(--mono);
+            font-size: 12px;
+            color: var(--amber);
+            text-align: center;
+            word-break: break-all;
+            letter-spacing: 1px;
+        }
+
+        .btn-continue {
+            display: block;
+            width: 100%;
+            padding: 11px;
+            background: var(--bg);
+            color: var(--green);
+            border: 1px solid var(--green);
+            font-family: var(--mono);
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-top: 16px;
+            text-decoration: none;
+            text-align: center;
+        }
+        .btn-continue:hover { background: var(--green); color: var(--bg); }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="head">
+        <div class="mark">CS</div>
+        <div>
+            <div class="brand">CLOUDSHIELD</div>
+            <div class="sub">MFA ENROLLMENT</div>
+        </div>
+    </div>
+
+    <div class="status-bar">
+        <span class="ok">ACCOUNT PROVISIONED</span>
+        <span>MFA SETUP</span>
+    </div>
+
+    <div class="body">
+        <div class="term-line">
+            <span class="prompt">$</span>mfa --setup --user={{ username }}
+        </div>
+
+        <div class="instructions">
+            <div class="step"><span class="num">01</span><span>Open Google Authenticator on your device</span></div>
+            <div class="step"><span class="num">02</span><span>Tap [+] → Scan QR code</span></div>
+            <div class="step"><span class="num">03</span><span>Scan the QR code below</span></div>
+            <div class="step"><span class="num">04</span><span>Click [ CONTINUE TO LOGIN ]</span></div>
+        </div>
+
+        <div class="qr-frame">
+            <img src="{{ qr_code }}" alt="QR Code" width="200">
+        </div>
+
+        <div class="secret-label">manual entry key</div>
+        <div class="secret-box">{{ secret }}</div>
+
+        <a href="{{ url_for('login') }}" class="btn-continue">[ CONTINUE TO LOGIN ]</a>
+    </div>
+</div>
+
+</body>
+</html>

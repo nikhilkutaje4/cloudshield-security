@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>CloudShield · Event Log</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg: #0a0f14;
+            --panel: #0f1519;
+            --panel-2: #131a20;
+            --border: #1a2530;
+            --border-light: #243040;
+            --text: #c9d1d9;
+            --text-dim: #8b949e;
+            --text-mute: #4b5563;
+            --green: #4ade80;
+            --amber: #fbbf24;
+            --red: #f87171;
+            --cyan: #67e8f9;
+            --blue: #60a5fa;
+            --purple: #c084fc;
+            --mono: 'JetBrains Mono', 'Courier New', monospace;
+            --sans: 'Inter', system-ui, sans-serif;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: var(--sans);
+            min-height: 100vh;
+            display: flex;
+            font-size: 13px;
+        }
+
+        .sidebar {
+            width: 230px;
+            background: var(--panel);
+            border-right: 1px solid var(--border);
+            position: fixed;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .brand {
+            padding: 20px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .brand-mark {
+            width: 32px;
+            height: 32px;
+            background: var(--bg);
+            border: 1px solid var(--green);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: var(--mono);
+            font-weight: 700;
+            color: var(--green);
+            font-size: 14px;
+        }
+
+        .brand-text .name {
+            font-family: var(--mono);
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--text);
+            letter-spacing: 0.5px;
+        }
+
+        .brand-text .sub {
+            font-family: var(--mono);
+            font-size: 9px;
+            color: var(--text-mute);
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+        }
+
+        .status-line {
+            padding: 12px 20px;
+            background: var(--panel-2);
+            border-bottom: 1px solid var(--border);
+            font-family: var(--mono);
+            font-size: 10px;
+            color: var(--text-dim);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .status-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--green);
+            box-shadow: 0 0 6px var(--green);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.4;
+            }
+        }
+
+        .nav-section {
+            padding: 15px 0;
+            flex: 1;
+        }
+
+        .nav-label {
+            padding: 8px 20px;
+            font-family: var(--mono);
+            font-size: 9px;
+            color: var(--text-mute);
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            margin-top: 10px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 9px 20px;
+            color: var(--text-dim);
+            text-decoration: none;
+            font-family: var(--mono);
+            font-size: 12px;
+            border-left: 2px solid transparent;
+        }
+
+        .nav-item:hover {
+            background: var(--panel-2);
+            color: var(--text);
+            border-left-color: var(--border-light);
+        }
+
+        .nav-item.active {
+            background: var(--panel-2);
+            color: var(--green);
+            border-left-color: var(--green);
+        }
+
+        .nav-item .marker {
+            color: var(--text-mute);
+            font-size: 11px;
+            width: 12px;
+        }
+
+        .nav-item.active .marker {
+            color: var(--green);
+        }
+
+        .user-block {
+            border-top: 1px solid var(--border);
+            padding: 15px 20px;
+            font-family: var(--mono);
+        }
+
+        .user-block .row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 10px;
+            color: var(--text-mute);
+            margin-bottom: 4px;
+        }
+
+        .user-block .username {
+            color: var(--cyan);
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .user-block .logout {
+            color: var(--red);
+            text-decoration: none;
+            font-size: 10px;
+            border: 1px solid var(--red);
+            padding: 3px 8px;
+            margin-top: 8px;
+            display: inline-block;
+        }
+
+        .user-block .logout:hover {
+            background: var(--red);
+            color: var(--bg);
+        }
+
+        .main {
+            margin-left: 230px;
+            flex: 1;
+        }
+
+        .topbar {
+            padding: 15px 30px;
+            border-bottom: 1px solid var(--border);
+            background: var(--panel);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .breadcrumb {
+            font-family: var(--mono);
+            font-size: 11px;
+            color: var(--text-dim);
+        }
+
+        .breadcrumb .slash {
+            color: var(--text-mute);
+            margin: 0 6px;
+        }
+
+        .breadcrumb .current {
+            color: var(--green);
+        }
+
+        .topbar .meta {
+            font-family: var(--mono);
+            font-size: 11px;
+            color: var(--text-dim);
+            display: flex;
+            gap: 20px;
+        }
+
+        .topbar .meta .val {
+            color: var(--cyan);
+        }
+
+        .content {
+            padding: 25px 30px;
+        }
+
+        .page-title {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-bottom: 20px;
+        }
+
+        .page-title h1 {
+            font-family: var(--mono);
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        .page-title h1 .prefix {
+            color: var(--green);
+            margin-right: 6px;
+        }
+
+        .page-title .desc {
+            color: var(--text-mute);
+            font-size: 11px;
+            margin-top: 3px;
+            font-family: var(--mono);
+        }
+
+        .stats-bar {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 1px;
+            background: var(--border);
+            border: 1px solid var(--border);
+            margin-bottom: 20px;
+        }
+
+        .stat-cell {
+            background: var(--panel);
+            padding: 16px 20px;
+        }
+
+        .stat-cell .lbl {
+            font-family: var(--mono);
+            font-size: 10px;
+            color: var(--text-mute);
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            margin-bottom: 6px;
+        }
+
+        .stat-cell .val {
+            font-family: var(--mono);
+            font-size: 22px;
+            font-weight: 500;
+        }
+
+        .stat-cell .val.c {
+            color: var(--cyan);
+        }
+
+        .stat-cell .val.g {
+            color: var(--green);
+        }
+
+        .stat-cell .val.a {
+            color: var(--amber);
+        }
+
+        .stat-cell .val.r {
+            color: var(--red);
+        }
+
+        .stat-cell .val.b {
+            color: var(--blue);
+        }
+
+        .filter-bar {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .filter-input {
+            flex: 1;
+            padding: 10px 14px;
+            background: var(--panel);
+            border: 1px solid var(--border);
+            color: var(--text);
+            font-family: var(--mono);
+            font-size: 12px;
+            outline: none;
+        }
+
+        .filter-input:focus {
+            border-color: var(--green);
+        }
+
+        .filter-input::placeholder {
+            color: var(--text-mute);
+        }
+
+        .filter-select {
+            padding: 10px 14px;
+            background: var(--panel);
+            border: 1px solid var(--border);
+            color: var(--text);
+            font-family: var(--mono);
+            font-size: 12px;
+            outline: none;
+            cursor: pointer;
+        }
+
+        .log-panel {
+            border: 1px solid var(--border);
+            background: var(--panel);
+        }
+
+        .log-head {
+            padding: 12px 18px;
+            border-bottom: 1px solid var(--border);
+            background: var(--panel-2);
+            font-family: var(--mono);
+            font-size: 11px;
+            color: var(--text);
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .log-head::before {
+            content: '▸ ';
+            color: var(--green);
+        }
+
+        .log-head .info {
+            color: var(--text-mute);
+            text-transform: none;
+            letter-spacing: 0;
+        }
+
+        .log-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-family: var(--mono);
+            font-size: 11px;
+        }
+
+        .log-table th {
+            text-align: left;
+            padding: 10px 18px;
+            font-size: 9px;
+            font-weight: 600;
+            color: var(--text-mute);
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            border-bottom: 1px solid var(--border);
+            background: var(--bg);
+        }
+
+        .log-table td {
+            padding: 10px 18px;
+            border-bottom: 1px solid var(--border);
+            color: var(--text);
+        }
+
+        .log-table tr:hover td {
+            background: var(--panel-2);
+        }
+
+        .log-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .log-time {
+            color: var(--text-mute);
+            font-size: 10px;
+        }
+
+        .log-user {
+            color: var(--cyan);
+            font-weight: 600;
+        }
+
+        .log-ip {
+            color: var(--text-dim);
+            font-size: 10px;
+        }
+
+        .log-action {
+            color: var(--text);
+        }
+
+        .badge {
+            font-family: var(--mono);
+            font-size: 9px;
+            padding: 3px 8px;
+            border: 1px solid;
+            letter-spacing: 0.5px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .lvl-normal {
+            color: var(--green);
+            border-color: var(--green);
+        }
+
+        .lvl-low {
+            color: var(--amber);
+            border-color: var(--amber);
+        }
+
+        .lvl-high {
+            color: var(--red);
+            border-color: var(--red);
+        }
+
+        .cat-badge {
+            font-family: var(--mono);
+            font-size: 9px;
+            padding: 2px 6px;
+            border: 1px solid var(--border-light);
+            color: var(--text-dim);
+            text-transform: uppercase;
+        }
+
+        .cat-auth {
+            color: var(--cyan);
+            border-color: var(--cyan);
+        }
+
+        .cat-vault {
+            color: var(--green);
+            border-color: var(--green);
+        }
+
+        .cat-ids {
+            color: var(--purple);
+            border-color: var(--purple);
+        }
+
+        .cat-sys {
+            color: var(--text-dim);
+        }
+
+        .empty {
+            padding: 40px 20px;
+            text-align: center;
+            font-family: var(--mono);
+            font-size: 11px;
+            color: var(--text-mute);
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="sidebar">
+        <div class="brand">
+            <div class="brand-mark">CS</div>
+            <div class="brand-text">
+                <div class="name">CLOUDSHIELD</div>
+                <div class="sub">SOC v1.0</div>
+            </div>
+        </div>
+        <div class="status-line">
+            <div class="status-dot"></div>
+            <span>SYSTEM · OPERATIONAL</span>
+        </div>
+        <div class="nav-section">
+            <div class="nav-label">─ CONSOLE</div>
+            <a href="{{ url_for('dashboard') }}" class="nav-item">
+                <span class="marker">▸</span><span>Overview</span>
+            </a>
+            <a href="{{ url_for('vault') }}" class="nav-item">
+                <span class="marker">▸</span><span>Cipher Vault</span>
+            </a>
+            <a href="{{ url_for('ids_dashboard') }}" class="nav-item">
+                <span class="marker">▸</span><span>Threat Monitor</span>
+            </a>
+            <div class="nav-label">─ SECURITY</div>
+            <a href="{{ url_for('auth_log') }}" class="nav-item">
+                <span class="marker">▸</span><span>Auth Log</span>
+            </a>
+            <a href="{{ url_for('event_log') }}" class="nav-item active">
+                <span class="marker">▸</span><span>Event Log</span>
+            </a>
+        </div>
+        <div class="user-block">
+            <div class="row"><span>OPERATOR</span><span>SESSION</span></div>
+            <div class="row"><span class="username">{{ username }}</span><span style="color:var(--green);">ACTIVE</span>
+            </div>
+            <a href="{{ url_for('logout') }}" class="logout">[ TERMINATE ]</a>
+        </div>
+    </div>
+
+    <div class="main">
+        <div class="topbar">
+            <div class="breadcrumb">
+                /cloudshield <span class="slash">/</span>
+                /logs <span class="slash">/</span>
+                <span class="current">events</span>
+            </div>
+            <div class="meta">
+                <div>USER: <span class="val">{{ username }}</span></div>
+                <div>ENTRIES: <span class="val">{{ total }}</span></div>
+                <div>USERS: <span class="val">{{ unique_users }}</span></div>
+            </div>
+        </div>
+
+        <div class="content">
+            <div class="page-title">
+                <div>
+                    <h1><span class="prefix">$</span>journalctl --all --system</h1>
+                    <div class="desc">System-wide event stream · all users · all layers</div>
+                </div>
+            </div>
+
+            <!-- Stats -->
+            <div class="stats-bar">
+                <div class="stat-cell">
+                    <div class="lbl">TOTAL EVENTS</div>
+                    <div class="val c">{{ '%04d' % total }}</div>
+                </div>
+                <div class="stat-cell">
+                    <div class="lbl">NORMAL</div>
+                    <div class="val g">{{ '%04d' % normal_count }}</div>
+                </div>
+                <div class="stat-cell">
+                    <div class="lbl">LOW · WARN</div>
+                    <div class="val a">{{ '%04d' % low_count }}</div>
+                </div>
+                <div class="stat-cell">
+                    <div class="lbl">HIGH · CRITICAL</div>
+                    <div class="val r">{{ '%04d' % high_count }}</div>
+                </div>
+                <div class="stat-cell">
+                    <div class="lbl">UNIQUE USERS</div>
+                    <div class="val b">{{ '%04d' % unique_users }}</div>
+                </div>
+            </div>
+
+            <!-- Filter -->
+            <div class="filter-bar">
+                <input type="text" class="filter-input" id="searchInput"
+                    placeholder="grep 'search all events...' (user, action, IP, category...)" oninput="filterTable()">
+                <select class="filter-select" id="catFilter" onchange="filterTable()">
+                    <option value="">ALL CATEGORIES</option>
+                    <option value="vault">VAULT</option>
+                    <option value="ids">IDS</option>
+                </select>
+                <select class="filter-select" id="levelFilter" onchange="filterTable()">
+                    <option value="">ALL LEVELS</option>
+                    <option value="normal">NORMAL</option>
+                    <option value="low">LOW</option>
+                    <option value="high">HIGH</option>
+                </select>
+            </div>
+
+            <!-- Table -->
+            <div class="log-panel">
+                <div class="log-head">
+                    UNIFIED EVENT STREAM
+                    <span class="info">last 200 entries · reverse chronological</span>
+                </div>
+                {% if logs %}
+                <table class="log-table" id="logTable">
+                    <thead>
+                        <tr>
+                            <th style="width:40px;">#</th>
+                            <th style="width:140px;">TIMESTAMP</th>
+                            <th style="width:100px;">USER</th>
+                            <th style="width:80px;">CATEGORY</th>
+                            <th>ACTION</th>
+                            <th style="width:110px;">IP ADDRESS</th>
+                            <th style="width:80px;">LEVEL</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for log in logs %}
+                        {% set act = log['action']|lower %}
+                        {% set category = 'sys' %}
+
+                        {% if 'vault' in act %}
+                        {% set category = 'vault' %}
+                        {% elif 'ids' in act or 'scan' in act %}
+                        {% set category = 'ids' %}
+                        {% endif %}
+
+                        {% if category == 'vault' or category == 'ids' %}
+                        <tr>
+                            <td class="log-time">{{ '%03d' % loop.index }}</td>
+                            <td class="log-time">{{ log['timestamp'] }}</td>
+                            <td class="log-user">{{ log['username'] or '—' }}</td>
+
+                            <td>
+                                <span class="cat-badge cat-{{ category }}">
+                                    {{ category }}
+                                </span>
+                            </td>
+
+                            <td class="log-action">{{ log['action'] }}</td>
+                            <td class="log-ip">{{ log['ip_address'] or '—' }}</td>
+
+                            <td>
+                                <span class="badge lvl-{{ log['threat_level']|lower }}">
+                                    {{ log['threat_level'] }}
+                                </span>
+                            </td>
+                        </tr>
+                        {% endif %}
+
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                <div class="empty">// no events recorded //</div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function filterTable() {
+            const search = document.getElementById('searchInput').value.toLowerCase();
+            const cat = document.getElementById('catFilter').value.toLowerCase();
+            const level = document.getElementById('levelFilter').value.toLowerCase();
+            const rows = document.querySelectorAll('#logTable tbody tr');
+
+            rows.forEach(row => {
+                const text = row.textContent.toLowerCase();
+                const rowCat = row.querySelector('.cat-badge').textContent.toLowerCase().trim();
+                const rowLevel = row.querySelector('.badge:not(.cat-badge)').textContent.toLowerCase().trim();
+
+                const matchSearch = !search || text.includes(search);
+                const matchCat = !cat || rowCat === cat;
+                const matchLevel = !level || rowLevel === level;
+
+                row.style.display = (matchSearch && matchCat && matchLevel) ? '' : 'none';
+            });
+        }
+    </script>
+</body>
+
+</html>
