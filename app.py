@@ -1,4 +1,5 @@
 from datetime import datetime
+import hashlib
 from ids.autoencoder_predict import ensemble_predict, get_autoencoder_metadata
 from encryption.adaptive import (adaptive_encrypt, adaptive_decrypt,
                                   select_algorithm, ALGORITHMS,
@@ -62,7 +63,9 @@ def init_db():
             action TEXT,
             ip_address TEXT,
             timestamp TEXT DEFAULT CURRENT_TIMESTAMP,
-            threat_level TEXT DEFAULT 'Normal'
+            threat_level TEXT DEFAULT 'Normal',
+            prev_hash TEXT,
+            entry_hash TEXT
         )
     ''')
     cursor.execute('''
@@ -83,14 +86,60 @@ def init_db():
     conn.close()
     print("[+] Database initialized successfully")
 
+GENESIS_HASH = '0' * 64  # fixed starting value for the very first log entry
+
+def compute_entry_hash(prev_hash, username, action, ip, threat_level, timestamp):
+    """Fingerprint this entry's content together with the previous entry's
+    hash, so editing any past row breaks every hash chained after it."""
+    payload = f"{prev_hash}|{username}|{action}|{ip}|{threat_level}|{timestamp}"
+    return hashlib.sha256(payload.encode()).hexdigest()
+
 def log_action(username, action, ip, threat_level='Normal'):
     conn = get_db()
+
+    last_row = conn.execute(
+        'SELECT entry_hash FROM logs ORDER BY id DESC LIMIT 1'
+    ).fetchone()
+    prev_hash = last_row['entry_hash'] if last_row and last_row['entry_hash'] else GENESIS_HASH
+
+    timestamp = datetime.now().isoformat()
+    entry_hash = compute_entry_hash(prev_hash, username, action, ip, threat_level, timestamp)
+
     conn.execute(
-        'INSERT INTO logs (username, action, ip_address, threat_level) VALUES (?, ?, ?, ?)',
-        (username, action, ip, threat_level)
+        '''INSERT INTO logs (username, action, ip_address, threat_level, timestamp, prev_hash, entry_hash)
+           VALUES (?, ?, ?, ?, ?, ?, ?)''',
+        (username, action, ip, threat_level, timestamp, prev_hash, entry_hash)
     )
     conn.commit()
     conn.close()
+
+def verify_log_integrity():
+    """Walk the whole chain and confirm every entry's stored hash still
+    matches its content and correctly links to the entry before it."""
+    conn = get_db()
+    rows = conn.execute('SELECT * FROM logs ORDER BY id ASC').fetchall()
+    conn.close()
+
+    expected_prev = GENESIS_HASH
+    for row in rows:
+        recomputed = compute_entry_hash(
+            expected_prev, row['username'], row['action'],
+            row['ip_address'], row['threat_level'], row['timestamp']
+        )
+        if row['prev_hash'] != expected_prev or row['entry_hash'] != recomputed:
+            return {
+                'intact': False,
+                'tampered_at_id': row['id'],
+                'total_entries': len(rows),
+                'message': f"Chain broken at log entry #{row['id']} \u2014 stored hash no longer matches its content."
+            }
+        expected_prev = row['entry_hash']
+
+    return {
+        'intact': True,
+        'total_entries': len(rows),
+        'message': f'Chain verified \u2014 all {len(rows)} log entries intact, no tampering detected.'
+    }
 
 def get_recent_threat_count(username):
     """Count high/low threats in last 24 hours for this user"""
@@ -280,6 +329,14 @@ def verify_fingerprint_route():
                            fingerprint_hash=user['fingerprint_hash'])
 
 # ── DASHBOARD ──────────────────────────────────────────────
+@app.route('/admin/verify-logs')
+def verify_logs_route():
+    if 'username' not in session:
+        return redirect(url_for('login'))
+    from flask import jsonify as _jsonify
+    result = verify_log_integrity()
+    return _jsonify(result)
+
 @app.route('/dashboard')
 def dashboard():
     if 'username' not in session:
