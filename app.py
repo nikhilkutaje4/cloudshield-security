@@ -329,6 +329,21 @@ def verify_fingerprint_route():
                            fingerprint_hash=user['fingerprint_hash'])
 
 # ── DASHBOARD ──────────────────────────────────────────────
+@app.route('/admin/users')
+def admin_users_route():
+    if 'username' not in session:
+        return redirect(url_for('login'))
+    from flask import jsonify as _jsonify
+    conn = get_db()
+    users = conn.execute(
+        'SELECT id, username, email, created_at FROM users ORDER BY id ASC'
+    ).fetchall()
+    conn.close()
+    return _jsonify({
+        'total_users': len(users),
+        'users': [dict(u) for u in users]
+    })
+
 @app.route('/admin/verify-logs')
 def verify_logs_route():
     if 'username' not in session:
