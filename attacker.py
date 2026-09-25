@@ -17,7 +17,7 @@ from datetime import datetime
 app = Flask(__name__)
 
 # Target CloudShield endpoint
-CLOUDSHIELD_URL = 'http://127.0.0.1:5000/api/ids/analyze'
+CLOUDSHIELD_URL = 'https://cloudshield-security.onrender.com/api/ids/analyze' 
 
 # ── Attack Payload Library ──────────────────────────────────
 ATTACK_PAYLOADS = {
@@ -218,7 +218,6 @@ def fire_custom():
         })
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)}), 500
-
 @app.route('/rapid-fire', methods=['POST'])
 def rapid_fire():
     """Fire multiple attacks in sequence"""

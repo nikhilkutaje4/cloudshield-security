@@ -2920,3 +2920,301 @@
 2026-09-01 20:48:16,852 INFO 127.0.0.1 - - [01/Sep/2026 20:48:16] "[32mGET / HTTP/1.1[0m" 302 -
 2026-09-01 20:48:16,911 INFO 127.0.0.1 - - [01/Sep/2026 20:48:16] "GET /login HTTP/1.1" 200 -
 2026-09-01 20:48:17,249 INFO 127.0.0.1 - - [01/Sep/2026 20:48:17] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2026-09-03 15:26:30,054 INFO [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://192.168.137.211:5000
+2026-09-03 15:26:30,054 INFO [33mPress CTRL+C to quit[0m
+2026-09-03 15:26:30,056 INFO  * Restarting with stat
+2026-09-03 15:26:31,930 WARNING  * Debugger is active!
+2026-09-03 15:26:31,931 INFO  * Debugger PIN: 763-611-427
+2026-09-03 15:32:02,629 INFO [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://192.168.137.211:5000
+2026-09-03 15:32:02,629 INFO [33mPress CTRL+C to quit[0m
+2026-09-03 15:32:02,631 INFO  * Restarting with stat
+2026-09-03 15:32:04,433 WARNING  * Debugger is active!
+2026-09-03 15:32:04,434 INFO  * Debugger PIN: 763-611-427
+2026-09-03 15:32:33,428 INFO 127.0.0.1 - - [03/Sep/2026 15:32:33] "[32mGET /admin/verify-logs HTTP/1.1[0m" 302 -
+2026-09-03 15:32:33,489 INFO 127.0.0.1 - - [03/Sep/2026 15:32:33] "GET /login HTTP/1.1" 200 -
+2026-09-03 15:32:34,855 INFO 127.0.0.1 - - [03/Sep/2026 15:32:34] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2026-09-03 15:33:57,777 INFO 127.0.0.1 - - [03/Sep/2026 15:33:57] "GET /register HTTP/1.1" 200 -
+2026-09-03 15:34:30,053 INFO REGISTER SUCCESS | User: nikhilil
+2026-09-03 15:34:30,055 INFO 127.0.0.1 - - [03/Sep/2026 15:34:30] "[32mPOST /register HTTP/1.1[0m" 302 -
+2026-09-03 15:34:30,142 INFO 127.0.0.1 - - [03/Sep/2026 15:34:30] "GET /setup-mfa HTTP/1.1" 200 -
+2026-09-03 15:35:07,826 INFO 127.0.0.1 - - [03/Sep/2026 15:35:07] "GET /login HTTP/1.1" 200 -
+2026-09-03 15:35:25,514 INFO PASSWORD OK | User: nikhilil | IP: 127.0.0.1
+2026-09-03 15:35:25,537 INFO 127.0.0.1 - - [03/Sep/2026 15:35:25] "[32mPOST /login HTTP/1.1[0m" 302 -
+2026-09-03 15:35:25,560 INFO 127.0.0.1 - - [03/Sep/2026 15:35:25] "GET /verify-otp HTTP/1.1" 200 -
+2026-09-03 15:35:39,211 INFO OTP OK | User: nikhilil | IP: 127.0.0.1
+2026-09-03 15:35:39,236 INFO 127.0.0.1 - - [03/Sep/2026 15:35:39] "[32mPOST /verify-otp HTTP/1.1[0m" 302 -
+2026-09-03 15:35:39,273 INFO 127.0.0.1 - - [03/Sep/2026 15:35:39] "GET /verify-fingerprint HTTP/1.1" 200 -
+2026-09-03 15:35:47,141 INFO 3FA SUCCESS | User: nikhilil | IP: 127.0.0.1
+2026-09-03 15:35:47,166 INFO 127.0.0.1 - - [03/Sep/2026 15:35:47] "[32mPOST /verify-fingerprint HTTP/1.1[0m" 302 -
+2026-09-03 15:35:47,200 INFO 127.0.0.1 - - [03/Sep/2026 15:35:47] "GET /dashboard HTTP/1.1" 200 -
+2026-09-03 15:35:54,869 INFO 127.0.0.1 - - [03/Sep/2026 15:35:54] "GET /ids HTTP/1.1" 200 -
+2026-09-03 15:35:56,921 INFO 127.0.0.1 - - [03/Sep/2026 15:35:56] "GET /api/live-feed HTTP/1.1" 200 -
+2026-09-03 15:35:58,931 INFO 127.0.0.1 - - [03/Sep/2026 15:35:58] "GET /api/live-feed HTTP/1.1" 200 -
+2026-09-03 15:36:00,307 INFO 127.0.0.1 - - [03/Sep/2026 15:36:00] "GET /vault HTTP/1.1" 200 -
+2026-09-03 15:36:01,533 INFO 127.0.0.1 - - [03/Sep/2026 15:36:01] "GET /dashboard HTTP/1.1" 200 -
+2026-09-03 15:36:25,132 INFO 127.0.0.1 - - [03/Sep/2026 15:36:25] "GET /admin/verify-logs HTTP/1.1" 200 -
+2026-09-03 15:44:33,934 INFO [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://192.168.137.211:5000
+2026-09-03 15:44:33,934 INFO [33mPress CTRL+C to quit[0m
+2026-09-03 15:44:33,935 INFO  * Restarting with stat
+2026-09-03 15:44:35,736 WARNING  * Debugger is active!
+2026-09-03 15:44:35,738 INFO  * Debugger PIN: 763-611-427
+2026-09-03 15:47:10,995 INFO 127.0.0.1 - - [03/Sep/2026 15:47:10] "[32mGET / HTTP/1.1[0m" 302 -
+2026-09-03 15:47:11,017 INFO 127.0.0.1 - - [03/Sep/2026 15:47:11] "GET /login HTTP/1.1" 200 -
+2026-09-03 15:47:33,529 INFO 127.0.0.1 - - [03/Sep/2026 15:47:33] "GET /register HTTP/1.1" 200 -
+2026-09-03 15:47:51,682 INFO REGISTER SUCCESS | User: nikhilill
+2026-09-03 15:47:51,683 INFO 127.0.0.1 - - [03/Sep/2026 15:47:51] "[32mPOST /register HTTP/1.1[0m" 302 -
+2026-09-03 15:47:51,739 INFO 127.0.0.1 - - [03/Sep/2026 15:47:51] "GET /setup-mfa HTTP/1.1" 200 -
+2026-09-03 15:48:30,874 INFO 127.0.0.1 - - [03/Sep/2026 15:48:30] "GET /login HTTP/1.1" 200 -
+2026-09-03 15:48:44,280 INFO PASSWORD OK | User: nikhilill | IP: 127.0.0.1
+2026-09-03 15:48:44,304 INFO 127.0.0.1 - - [03/Sep/2026 15:48:44] "[32mPOST /login HTTP/1.1[0m" 302 -
+2026-09-03 15:48:44,316 INFO 127.0.0.1 - - [03/Sep/2026 15:48:44] "GET /verify-otp HTTP/1.1" 200 -
+2026-09-03 15:48:55,108 INFO OTP OK | User: nikhilill | IP: 127.0.0.1
+2026-09-03 15:48:55,132 INFO 127.0.0.1 - - [03/Sep/2026 15:48:55] "[32mPOST /verify-otp HTTP/1.1[0m" 302 -
+2026-09-03 15:48:55,147 INFO 127.0.0.1 - - [03/Sep/2026 15:48:55] "GET /verify-fingerprint HTTP/1.1" 200 -
+2026-09-03 15:49:04,021 INFO 3FA SUCCESS | User: nikhilill | IP: 127.0.0.1
+2026-09-03 15:49:04,027 INFO 127.0.0.1 - - [03/Sep/2026 15:49:04] "[32mPOST /verify-fingerprint HTTP/1.1[0m" 302 -
+2026-09-03 15:49:04,055 INFO 127.0.0.1 - - [03/Sep/2026 15:49:04] "GET /dashboard HTTP/1.1" 200 -
+2026-09-03 15:49:34,604 INFO 127.0.0.1 - - [03/Sep/2026 15:49:34] "GET /admin/verify-logs HTTP/1.1" 200 -
+2026-09-03 15:59:39,052 INFO 127.0.0.1 - - [03/Sep/2026 15:59:39] "GET /vault HTTP/1.1" 200 -
+2026-09-03 15:59:56,680 INFO 127.0.0.1 - - [03/Sep/2026 15:59:56] "[35m[1mPOST /vault/add HTTP/1.1[0m" 500 -
+2026-09-03 15:59:56,855 INFO 127.0.0.1 - - [03/Sep/2026 15:59:56] "GET /vault/add?__debugger__=yes&cmd=resource&f=style.css HTTP/1.1" 200 -
+2026-09-03 15:59:56,864 INFO 127.0.0.1 - - [03/Sep/2026 15:59:56] "GET /vault/add?__debugger__=yes&cmd=resource&f=debugger.js HTTP/1.1" 200 -
+2026-09-03 15:59:56,905 INFO 127.0.0.1 - - [03/Sep/2026 15:59:56] "GET /vault/add?__debugger__=yes&cmd=resource&f=console.png&s=VrfOiv8MfhoQqL0ixANr HTTP/1.1" 200 -
+2026-09-03 15:59:56,918 INFO 127.0.0.1 - - [03/Sep/2026 15:59:56] "GET /vault/add?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1" 200 -
+2026-09-03 22:40:12,524 INFO [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://192.168.1.8:5000
+2026-09-03 22:40:12,524 INFO [33mPress CTRL+C to quit[0m
+2026-09-03 22:40:12,526 INFO  * Restarting with stat
+2026-09-03 22:40:14,567 WARNING  * Debugger is active!
+2026-09-03 22:40:14,585 INFO  * Debugger PIN: 763-611-427
+2026-09-03 22:41:44,395 INFO 127.0.0.1 - - [03/Sep/2026 22:41:44] "[32mGET / HTTP/1.1[0m" 302 -
+2026-09-03 22:41:44,447 INFO 127.0.0.1 - - [03/Sep/2026 22:41:44] "GET /login HTTP/1.1" 200 -
+2026-09-03 22:41:44,786 INFO 127.0.0.1 - - [03/Sep/2026 22:41:44] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2026-09-03 22:41:50,865 INFO 127.0.0.1 - - [03/Sep/2026 22:41:50] "GET /register HTTP/1.1" 200 -
+2026-09-03 22:42:09,349 INFO REGISTER SUCCESS | User: nikhilll
+2026-09-03 22:42:09,352 INFO 127.0.0.1 - - [03/Sep/2026 22:42:09] "[32mPOST /register HTTP/1.1[0m" 302 -
+2026-09-03 22:42:09,445 INFO 127.0.0.1 - - [03/Sep/2026 22:42:09] "GET /setup-mfa HTTP/1.1" 200 -
+2026-09-03 22:42:45,898 INFO 127.0.0.1 - - [03/Sep/2026 22:42:45] "GET /login HTTP/1.1" 200 -
+2026-09-03 22:42:56,125 INFO PASSWORD OK | User: nikhilll | IP: 127.0.0.1
+2026-09-03 22:42:56,149 INFO 127.0.0.1 - - [03/Sep/2026 22:42:56] "[32mPOST /login HTTP/1.1[0m" 302 -
+2026-09-03 22:42:56,179 INFO 127.0.0.1 - - [03/Sep/2026 22:42:56] "GET /verify-otp HTTP/1.1" 200 -
+2026-09-03 22:43:09,221 WARNING OTP FAILED | User: nikhilll | IP: 127.0.0.1
+2026-09-03 22:43:09,231 INFO 127.0.0.1 - - [03/Sep/2026 22:43:09] "POST /verify-otp HTTP/1.1" 200 -
+2026-09-03 22:43:20,885 INFO OTP OK | User: nikhilll | IP: 127.0.0.1
+2026-09-03 22:43:20,911 INFO 127.0.0.1 - - [03/Sep/2026 22:43:20] "[32mPOST /verify-otp HTTP/1.1[0m" 302 -
+2026-09-03 22:43:20,958 INFO 127.0.0.1 - - [03/Sep/2026 22:43:20] "GET /verify-fingerprint HTTP/1.1" 200 -
+2026-09-03 22:43:28,250 INFO 3FA SUCCESS | User: nikhilll | IP: 127.0.0.1
+2026-09-03 22:43:28,274 INFO 127.0.0.1 - - [03/Sep/2026 22:43:28] "[32mPOST /verify-fingerprint HTTP/1.1[0m" 302 -
+2026-09-03 22:43:28,319 INFO 127.0.0.1 - - [03/Sep/2026 22:43:28] "GET /dashboard HTTP/1.1" 200 -
+2026-09-03 22:43:31,581 INFO 127.0.0.1 - - [03/Sep/2026 22:43:31] "GET /vault HTTP/1.1" 200 -
+2026-09-03 22:43:33,465 INFO 127.0.0.1 - - [03/Sep/2026 22:43:33] "GET /ids HTTP/1.1" 200 -
+2026-09-03 22:43:35,554 INFO 127.0.0.1 - - [03/Sep/2026 22:43:35] "GET /api/live-feed HTTP/1.1" 200 -
+2026-09-03 22:43:37,560 INFO 127.0.0.1 - - [03/Sep/2026 22:43:37] "GET /api/live-feed HTTP/1.1" 200 -
+2026-09-03 22:43:40,302 INFO 127.0.0.1 - - [03/Sep/2026 22:43:40] "GET /api/live-feed HTTP/1.1" 200 -
+2026-09-03 22:43:42,298 INFO 127.0.0.1 - - [03/Sep/2026 22:43:42] "GET /api/live-feed HTTP/1.1" 200 -
+2026-09-03 22:43:44,310 INFO 127.0.0.1 - - [03/Sep/2026 22:43:44] "GET /api/live-feed HTTP/1.1" 200 -
+2026-09-03 22:43:46,298 INFO 127.0.0.1 - - [03/Sep/2026 22:43:46] "GET /api/live-feed HTTP/1.1" 200 -
+2026-09-03 22:43:48,308 INFO 127.0.0.1 - - [03/Sep/2026 22:43:48] "GET /api/live-feed HTTP/1.1" 200 -
+2026-09-03 22:43:50,302 INFO 127.0.0.1 - - [03/Sep/2026 22:43:50] "GET /api/live-feed HTTP/1.1" 200 -
+2026-09-03 22:43:51,567 INFO 127.0.0.1 - - [03/Sep/2026 22:43:51] "GET /api/live-feed HTTP/1.1" 200 -
+2026-09-03 22:43:54,305 INFO 127.0.0.1 - - [03/Sep/2026 22:43:54] "GET /api/live-feed HTTP/1.1" 200 -
+2026-09-03 22:43:55,627 INFO 127.0.0.1 - - [03/Sep/2026 22:43:55] "GET /admin/verify-logs HTTP/1.1" 200 -
+2026-09-03 22:43:56,311 INFO 127.0.0.1 - - [03/Sep/2026 22:43:56] "GET /api/live-feed HTTP/1.1" 200 -
+2026-09-03 22:43:58,311 INFO 127.0.0.1 - - [03/Sep/2026 22:43:58] "GET /api/live-feed HTTP/1.1" 200 -
+2026-09-03 22:44:00,310 INFO 127.0.0.1 - - [03/Sep/2026 22:44:00] "GET /api/live-feed HTTP/1.1" 200 -
+2026-09-03 22:44:02,312 INFO 127.0.0.1 - - [03/Sep/2026 22:44:02] "GET /api/live-feed HTTP/1.1" 200 -
+2026-09-03 22:44:04,303 INFO 127.0.0.1 - - [03/Sep/2026 22:44:04] "GET /api/live-feed HTTP/1.1" 200 -
+2026-09-03 22:44:06,307 INFO 127.0.0.1 - - [03/Sep/2026 22:44:06] "GET /api/live-feed HTTP/1.1" 200 -
+2026-09-03 22:44:08,295 INFO 127.0.0.1 - - [03/Sep/2026 22:44:08] "GET /api/live-feed HTTP/1.1" 200 -
+2026-09-03 22:44:10,297 INFO 127.0.0.1 - - [03/Sep/2026 22:44:10] "GET /api/live-feed HTTP/1.1" 200 -
+2026-09-03 22:44:12,313 INFO 127.0.0.1 - - [03/Sep/2026 22:44:12] "GET /api/live-feed HTTP/1.1" 200 -
+2026-09-03 22:44:14,313 INFO 127.0.0.1 - - [03/Sep/2026 22:44:14] "GET /api/live-feed HTTP/1.1" 200 -
+2026-09-03 22:44:16,300 INFO 127.0.0.1 - - [03/Sep/2026 22:44:16] "GET /api/live-feed HTTP/1.1" 200 -
+2026-09-03 22:44:18,302 INFO 127.0.0.1 - - [03/Sep/2026 22:44:18] "GET /api/live-feed HTTP/1.1" 200 -
+2026-09-03 22:44:20,298 INFO 127.0.0.1 - - [03/Sep/2026 22:44:20] "GET /api/live-feed HTTP/1.1" 200 -
+2026-09-03 22:44:22,302 INFO 127.0.0.1 - - [03/Sep/2026 22:44:22] "GET /api/live-feed HTTP/1.1" 200 -
+2026-09-03 22:44:24,308 INFO 127.0.0.1 - - [03/Sep/2026 22:44:24] "GET /api/live-feed HTTP/1.1" 200 -
+2026-09-03 22:44:26,316 INFO 127.0.0.1 - - [03/Sep/2026 22:44:26] "GET /api/live-feed HTTP/1.1" 200 -
+2026-09-03 22:44:28,305 INFO 127.0.0.1 - - [03/Sep/2026 22:44:28] "GET /api/live-feed HTTP/1.1" 200 -
+2026-09-03 22:44:30,299 INFO 127.0.0.1 - - [03/Sep/2026 22:44:30] "GET /api/live-feed HTTP/1.1" 200 -
+2026-09-03 22:44:32,298 INFO 127.0.0.1 - - [03/Sep/2026 22:44:32] "GET /api/live-feed HTTP/1.1" 200 -
+2026-09-03 22:44:34,301 INFO 127.0.0.1 - - [03/Sep/2026 22:44:34] "GET /api/live-feed HTTP/1.1" 200 -
+2026-09-03 22:44:36,301 INFO 127.0.0.1 - - [03/Sep/2026 22:44:36] "GET /api/live-feed HTTP/1.1" 200 -
+2026-09-03 22:44:38,303 INFO 127.0.0.1 - - [03/Sep/2026 22:44:38] "GET /api/live-feed HTTP/1.1" 200 -
+2026-09-03 22:44:40,297 INFO 127.0.0.1 - - [03/Sep/2026 22:44:40] "GET /api/live-feed HTTP/1.1" 200 -
+2026-09-03 22:44:42,300 INFO 127.0.0.1 - - [03/Sep/2026 22:44:42] "GET /api/live-feed HTTP/1.1" 200 -
+2026-09-03 22:44:44,304 INFO 127.0.0.1 - - [03/Sep/2026 22:44:44] "GET /api/live-feed HTTP/1.1" 200 -
+2026-09-03 22:44:46,305 INFO 127.0.0.1 - - [03/Sep/2026 22:44:46] "GET /api/live-feed HTTP/1.1" 200 -
+2026-09-03 22:44:48,296 INFO 127.0.0.1 - - [03/Sep/2026 22:44:48] "GET /api/live-feed HTTP/1.1" 200 -
+2026-09-03 22:44:50,299 INFO 127.0.0.1 - - [03/Sep/2026 22:44:50] "GET /api/live-feed HTTP/1.1" 200 -
+2026-09-03 22:45:28,299 INFO 127.0.0.1 - - [03/Sep/2026 22:45:28] "GET /api/live-feed HTTP/1.1" 200 -
+2026-09-03 22:46:28,302 INFO 127.0.0.1 - - [03/Sep/2026 22:46:28] "GET /api/live-feed HTTP/1.1" 200 -
+2026-09-03 22:46:39,999 INFO 127.0.0.1 - - [03/Sep/2026 22:46:39] "GET /api/live-feed HTTP/1.1" 200 -
+2026-09-03 22:46:42,310 INFO 127.0.0.1 - - [03/Sep/2026 22:46:42] "GET /api/live-feed HTTP/1.1" 200 -
+2026-09-03 22:46:43,760 INFO 127.0.0.1 - - [03/Sep/2026 22:46:43] "GET /api/live-feed HTTP/1.1" 200 -
+2026-09-03 22:46:45,560 INFO 127.0.0.1 - - [03/Sep/2026 22:46:45] "GET /api/live-feed HTTP/1.1" 200 -
+2026-09-03 22:46:48,303 INFO 127.0.0.1 - - [03/Sep/2026 22:46:48] "GET /api/live-feed HTTP/1.1" 200 -
+2026-09-03 22:46:50,295 INFO 127.0.0.1 - - [03/Sep/2026 22:46:50] "GET /api/live-feed HTTP/1.1" 200 -
+2026-09-03 22:46:52,297 INFO 127.0.0.1 - - [03/Sep/2026 22:46:52] "GET /api/live-feed HTTP/1.1" 200 -
+2026-09-03 22:46:54,301 INFO 127.0.0.1 - - [03/Sep/2026 22:46:54] "GET /api/live-feed HTTP/1.1" 200 -
+2026-09-03 22:46:56,302 INFO 127.0.0.1 - - [03/Sep/2026 22:46:56] "GET /api/live-feed HTTP/1.1" 200 -
+2026-09-03 22:46:58,306 INFO 127.0.0.1 - - [03/Sep/2026 22:46:58] "GET /api/live-feed HTTP/1.1" 200 -
+2026-09-03 22:47:00,303 INFO 127.0.0.1 - - [03/Sep/2026 22:47:00] "GET /api/live-feed HTTP/1.1" 200 -
+2026-09-03 22:47:02,309 INFO 127.0.0.1 - - [03/Sep/2026 22:47:02] "GET /api/live-feed HTTP/1.1" 200 -
+2026-09-03 22:47:04,305 INFO 127.0.0.1 - - [03/Sep/2026 22:47:04] "GET /api/live-feed HTTP/1.1" 200 -
+2026-09-03 22:47:06,300 INFO 127.0.0.1 - - [03/Sep/2026 22:47:06] "GET /api/live-feed HTTP/1.1" 200 -
+2026-09-03 22:47:08,304 INFO 127.0.0.1 - - [03/Sep/2026 22:47:08] "GET /api/live-feed HTTP/1.1" 200 -
+2026-09-03 22:47:10,311 INFO 127.0.0.1 - - [03/Sep/2026 22:47:10] "GET /api/live-feed HTTP/1.1" 200 -
+2026-09-03 22:47:12,300 INFO 127.0.0.1 - - [03/Sep/2026 22:47:12] "GET /api/live-feed HTTP/1.1" 200 -
+2026-09-03 22:47:14,307 INFO 127.0.0.1 - - [03/Sep/2026 22:47:14] "GET /api/live-feed HTTP/1.1" 200 -
+2026-09-03 22:47:16,301 INFO 127.0.0.1 - - [03/Sep/2026 22:47:16] "GET /api/live-feed HTTP/1.1" 200 -
+2026-09-03 22:47:18,303 INFO 127.0.0.1 - - [03/Sep/2026 22:47:18] "GET /api/live-feed HTTP/1.1" 200 -
+2026-09-03 22:47:20,307 INFO 127.0.0.1 - - [03/Sep/2026 22:47:20] "GET /api/live-feed HTTP/1.1" 200 -
+2026-09-03 22:47:22,300 INFO 127.0.0.1 - - [03/Sep/2026 22:47:22] "GET /api/live-feed HTTP/1.1" 200 -
+2026-09-03 22:47:24,309 INFO 127.0.0.1 - - [03/Sep/2026 22:47:24] "GET /api/live-feed HTTP/1.1" 200 -
+2026-09-03 22:47:26,304 INFO 127.0.0.1 - - [03/Sep/2026 22:47:26] "GET /api/live-feed HTTP/1.1" 200 -
+2026-09-03 22:47:28,312 INFO 127.0.0.1 - - [03/Sep/2026 22:47:28] "GET /api/live-feed HTTP/1.1" 200 -
+2026-09-03 22:47:30,311 INFO 127.0.0.1 - - [03/Sep/2026 22:47:30] "GET /api/live-feed HTTP/1.1" 200 -
+2026-09-03 22:47:32,299 INFO 127.0.0.1 - - [03/Sep/2026 22:47:32] "GET /api/live-feed HTTP/1.1" 200 -
+2026-09-03 22:47:34,302 INFO 127.0.0.1 - - [03/Sep/2026 22:47:34] "GET /api/live-feed HTTP/1.1" 200 -
+2026-09-03 22:47:36,308 INFO 127.0.0.1 - - [03/Sep/2026 22:47:36] "GET /api/live-feed HTTP/1.1" 200 -
+2026-09-03 22:47:38,306 INFO 127.0.0.1 - - [03/Sep/2026 22:47:38] "GET /api/live-feed HTTP/1.1" 200 -
+2026-09-03 22:47:40,299 INFO 127.0.0.1 - - [03/Sep/2026 22:47:40] "GET /api/live-feed HTTP/1.1" 200 -
+2026-09-03 22:47:42,302 INFO 127.0.0.1 - - [03/Sep/2026 22:47:42] "GET /api/live-feed HTTP/1.1" 200 -
+2026-09-03 22:47:44,306 INFO 127.0.0.1 - - [03/Sep/2026 22:47:44] "GET /api/live-feed HTTP/1.1" 200 -
+2026-09-03 22:48:28,310 INFO 127.0.0.1 - - [03/Sep/2026 22:48:28] "GET /api/live-feed HTTP/1.1" 200 -
+2026-09-03 22:49:28,319 INFO 127.0.0.1 - - [03/Sep/2026 22:49:28] "GET /api/live-feed HTTP/1.1" 200 -
+2026-09-03 22:49:58,373 INFO 127.0.0.1 - - [03/Sep/2026 22:49:58] "GET /api/live-feed HTTP/1.1" 200 -
+2026-09-03 22:49:59,564 INFO 127.0.0.1 - - [03/Sep/2026 22:49:59] "GET /api/live-feed HTTP/1.1" 200 -
+2026-09-03 22:50:02,369 INFO 127.0.0.1 - - [03/Sep/2026 22:50:02] "GET /api/live-feed HTTP/1.1" 200 -
+2026-09-03 22:50:03,400 INFO 127.0.0.1 - - [03/Sep/2026 22:50:03] "GET /admin/verify-logs HTTP/1.1" 200 -
+2026-09-03 22:50:04,304 INFO 127.0.0.1 - - [03/Sep/2026 22:50:04] "GET /api/live-feed HTTP/1.1" 200 -
+2026-09-03 22:50:06,302 INFO 127.0.0.1 - - [03/Sep/2026 22:50:06] "GET /api/live-feed HTTP/1.1" 200 -
+2026-09-03 22:50:08,296 INFO 127.0.0.1 - - [03/Sep/2026 22:50:08] "GET /api/live-feed HTTP/1.1" 200 -
+2026-09-03 22:50:10,182 INFO 127.0.0.1 - - [03/Sep/2026 22:50:10] "GET /api/live-feed HTTP/1.1" 200 -
+2026-09-03 22:50:11,553 INFO 127.0.0.1 - - [03/Sep/2026 22:50:11] "GET /api/live-feed HTTP/1.1" 200 -
+2026-09-03 22:50:53,116 INFO 127.0.0.1 - - [03/Sep/2026 22:50:53] "[32mGET / HTTP/1.1[0m" 302 -
+2026-09-03 22:50:53,139 INFO 127.0.0.1 - - [03/Sep/2026 22:50:53] "GET /login HTTP/1.1" 200 -
+2026-09-03 22:51:01,994 INFO 127.0.0.1 - - [03/Sep/2026 22:51:01] "GET /register HTTP/1.1" 200 -
+2026-09-03 22:51:19,027 INFO REGISTER SUCCESS | User: nikhillll
+2026-09-03 22:51:19,028 INFO 127.0.0.1 - - [03/Sep/2026 22:51:19] "[32mPOST /register HTTP/1.1[0m" 302 -
+2026-09-03 22:51:19,051 INFO 127.0.0.1 - - [03/Sep/2026 22:51:19] "GET /setup-mfa HTTP/1.1" 200 -
+2026-09-03 22:51:54,330 INFO 127.0.0.1 - - [03/Sep/2026 22:51:54] "GET /login HTTP/1.1" 200 -
+2026-09-03 22:52:03,258 INFO PASSWORD OK | User: nikhillll | IP: 127.0.0.1
+2026-09-03 22:52:03,281 INFO 127.0.0.1 - - [03/Sep/2026 22:52:03] "[32mPOST /login HTTP/1.1[0m" 302 -
+2026-09-03 22:52:03,291 INFO 127.0.0.1 - - [03/Sep/2026 22:52:03] "GET /verify-otp HTTP/1.1" 200 -
+2026-09-03 22:52:14,046 INFO OTP OK | User: nikhillll | IP: 127.0.0.1
+2026-09-03 22:52:14,072 INFO 127.0.0.1 - - [03/Sep/2026 22:52:14] "[32mPOST /verify-otp HTTP/1.1[0m" 302 -
+2026-09-03 22:52:14,090 INFO 127.0.0.1 - - [03/Sep/2026 22:52:14] "GET /verify-fingerprint HTTP/1.1" 200 -
+2026-09-03 22:52:20,103 INFO 3FA SUCCESS | User: nikhillll | IP: 127.0.0.1
+2026-09-03 22:52:20,129 INFO 127.0.0.1 - - [03/Sep/2026 22:52:20] "[32mPOST /verify-fingerprint HTTP/1.1[0m" 302 -
+2026-09-03 22:52:20,146 INFO 127.0.0.1 - - [03/Sep/2026 22:52:20] "GET /dashboard HTTP/1.1" 200 -
+2026-09-03 22:52:40,725 INFO 127.0.0.1 - - [03/Sep/2026 22:52:40] "GET /admin/verify-logs HTTP/1.1" 200 -
+2026-09-03 22:54:07,507 INFO [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://192.168.1.8:5000
+2026-09-03 22:54:07,507 INFO [33mPress CTRL+C to quit[0m
+2026-09-03 22:54:07,510 INFO  * Restarting with stat
+2026-09-03 22:54:09,558 WARNING  * Debugger is active!
+2026-09-03 22:54:09,560 INFO  * Debugger PIN: 763-611-427
+2026-09-03 22:54:33,110 INFO 127.0.0.1 - - [03/Sep/2026 22:54:33] "[32mGET / HTTP/1.1[0m" 302 -
+2026-09-03 22:54:33,143 INFO 127.0.0.1 - - [03/Sep/2026 22:54:33] "GET /login HTTP/1.1" 200 -
+2026-09-03 22:54:47,976 WARNING LOGIN FAILED | User: nikhilll | IP: 127.0.0.1
+2026-09-03 22:54:47,999 INFO 127.0.0.1 - - [03/Sep/2026 22:54:47] "POST /login HTTP/1.1" 200 -
+2026-09-03 22:54:52,280 INFO 127.0.0.1 - - [03/Sep/2026 22:54:52] "GET /register HTTP/1.1" 200 -
+2026-09-03 22:55:19,437 INFO REGISTER SUCCESS | User: nikhilllll
+2026-09-03 22:55:19,437 INFO 127.0.0.1 - - [03/Sep/2026 22:55:19] "[32mPOST /register HTTP/1.1[0m" 302 -
+2026-09-03 22:55:19,492 INFO 127.0.0.1 - - [03/Sep/2026 22:55:19] "GET /setup-mfa HTTP/1.1" 200 -
+2026-09-03 22:55:41,397 INFO 127.0.0.1 - - [03/Sep/2026 22:55:41] "GET /login HTTP/1.1" 200 -
+2026-09-03 22:55:57,338 INFO PASSWORD OK | User: nikhilllll | IP: 127.0.0.1
+2026-09-03 22:55:57,362 INFO 127.0.0.1 - - [03/Sep/2026 22:55:57] "[32mPOST /login HTTP/1.1[0m" 302 -
+2026-09-03 22:55:57,380 INFO 127.0.0.1 - - [03/Sep/2026 22:55:57] "GET /verify-otp HTTP/1.1" 200 -
+2026-09-03 22:56:11,131 INFO OTP OK | User: nikhilllll | IP: 127.0.0.1
+2026-09-03 22:56:11,158 INFO 127.0.0.1 - - [03/Sep/2026 22:56:11] "[32mPOST /verify-otp HTTP/1.1[0m" 302 -
+2026-09-03 22:56:11,179 INFO 127.0.0.1 - - [03/Sep/2026 22:56:11] "GET /verify-fingerprint HTTP/1.1" 200 -
+2026-09-03 22:56:18,874 INFO 3FA SUCCESS | User: nikhilllll | IP: 127.0.0.1
+2026-09-03 22:56:18,881 INFO 127.0.0.1 - - [03/Sep/2026 22:56:18] "[32mPOST /verify-fingerprint HTTP/1.1[0m" 302 -
+2026-09-03 22:56:18,913 INFO 127.0.0.1 - - [03/Sep/2026 22:56:18] "GET /dashboard HTTP/1.1" 200 -
+2026-09-03 22:56:38,307 INFO 127.0.0.1 - - [03/Sep/2026 22:56:38] "GET /admin/verify-logs HTTP/1.1" 200 -
+2026-09-03 22:59:58,484 INFO [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://192.168.1.8:5000
+2026-09-03 22:59:58,484 INFO [33mPress CTRL+C to quit[0m
+2026-09-03 22:59:58,485 INFO  * Restarting with stat
+2026-09-03 23:00:00,695 WARNING  * Debugger is active!
+2026-09-03 23:00:00,697 INFO  * Debugger PIN: 763-611-427
+2026-09-03 23:00:51,879 INFO 127.0.0.1 - - [03/Sep/2026 23:00:51] "[32mGET / HTTP/1.1[0m" 302 -
+2026-09-03 23:00:51,911 INFO 127.0.0.1 - - [03/Sep/2026 23:00:51] "GET /login HTTP/1.1" 200 -
+2026-09-03 23:00:54,549 INFO 127.0.0.1 - - [03/Sep/2026 23:00:54] "GET /register HTTP/1.1" 200 -
+2026-09-03 23:01:14,333 INFO REGISTER SUCCESS | User: nikhiil
+2026-09-03 23:01:14,334 INFO 127.0.0.1 - - [03/Sep/2026 23:01:14] "[32mPOST /register HTTP/1.1[0m" 302 -
+2026-09-03 23:01:14,400 INFO 127.0.0.1 - - [03/Sep/2026 23:01:14] "GET /setup-mfa HTTP/1.1" 200 -
+2026-09-03 23:01:56,096 INFO 127.0.0.1 - - [03/Sep/2026 23:01:56] "GET /login HTTP/1.1" 200 -
+2026-09-03 23:02:07,192 INFO PASSWORD OK | User: nikhiil | IP: 127.0.0.1
+2026-09-03 23:02:07,217 INFO 127.0.0.1 - - [03/Sep/2026 23:02:07] "[32mPOST /login HTTP/1.1[0m" 302 -
+2026-09-03 23:02:07,235 INFO 127.0.0.1 - - [03/Sep/2026 23:02:07] "GET /verify-otp HTTP/1.1" 200 -
+2026-09-03 23:02:18,619 WARNING OTP FAILED | User: nikhiil | IP: 127.0.0.1
+2026-09-03 23:02:18,646 INFO 127.0.0.1 - - [03/Sep/2026 23:02:18] "POST /verify-otp HTTP/1.1" 200 -
+2026-09-03 23:02:31,529 INFO OTP OK | User: nikhiil | IP: 127.0.0.1
+2026-09-03 23:02:31,537 INFO 127.0.0.1 - - [03/Sep/2026 23:02:31] "[32mPOST /verify-otp HTTP/1.1[0m" 302 -
+2026-09-03 23:02:31,556 INFO 127.0.0.1 - - [03/Sep/2026 23:02:31] "GET /verify-fingerprint HTTP/1.1" 200 -
+2026-09-03 23:02:38,217 INFO 3FA SUCCESS | User: nikhiil | IP: 127.0.0.1
+2026-09-03 23:02:38,242 INFO 127.0.0.1 - - [03/Sep/2026 23:02:38] "[32mPOST /verify-fingerprint HTTP/1.1[0m" 302 -
+2026-09-03 23:02:38,274 INFO 127.0.0.1 - - [03/Sep/2026 23:02:38] "GET /dashboard HTTP/1.1" 200 -
+2026-09-03 23:02:58,169 INFO 127.0.0.1 - - [03/Sep/2026 23:02:58] "GET /admin/verify-logs HTTP/1.1" 200 -
+2026-09-03 23:27:56,807 INFO [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://192.168.1.8:5000
+2026-09-03 23:27:56,807 INFO [33mPress CTRL+C to quit[0m
+2026-09-03 23:27:56,811 INFO  * Restarting with stat
+2026-09-03 23:27:58,771 WARNING  * Debugger is active!
+2026-09-03 23:27:58,774 INFO  * Debugger PIN: 763-611-427
+2026-09-25 13:16:53,606 INFO [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://192.168.1.5:5000
+2026-09-25 13:16:53,607 INFO [33mPress CTRL+C to quit[0m
+2026-09-25 13:16:53,609 INFO  * Restarting with stat
+2026-09-25 13:16:55,828 WARNING  * Debugger is active!
+2026-09-25 13:16:55,849 INFO  * Debugger PIN: 420-345-373
+2026-09-25 13:17:37,427 INFO 127.0.0.1 - - [25/Sep/2026 13:17:37] "[32mGET / HTTP/1.1[0m" 302 -
+2026-09-25 13:17:37,473 INFO 127.0.0.1 - - [25/Sep/2026 13:17:37] "GET /login HTTP/1.1" 200 -
+2026-09-25 13:17:38,043 INFO 127.0.0.1 - - [25/Sep/2026 13:17:38] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2026-09-25 13:17:43,147 INFO 127.0.0.1 - - [25/Sep/2026 13:17:43] "GET /register HTTP/1.1" 200 -
+2026-09-25 13:18:11,413 INFO REGISTER SUCCESS | User: nikhilll
+2026-09-25 13:18:11,414 INFO 127.0.0.1 - - [25/Sep/2026 13:18:11] "[32mPOST /register HTTP/1.1[0m" 302 -
+2026-09-25 13:18:11,516 INFO 127.0.0.1 - - [25/Sep/2026 13:18:11] "GET /setup-mfa HTTP/1.1" 200 -
+2026-09-25 13:18:47,679 INFO 127.0.0.1 - - [25/Sep/2026 13:18:47] "GET /login HTTP/1.1" 200 -
+2026-09-25 13:19:00,254 WARNING LOGIN FAILED | User: nikhlll | IP: 127.0.0.1
+2026-09-25 13:19:00,263 INFO 127.0.0.1 - - [25/Sep/2026 13:19:00] "POST /login HTTP/1.1" 200 -
+2026-09-25 13:19:27,484 INFO PASSWORD OK | User: nikhilll | IP: 127.0.0.1
+2026-09-25 13:19:27,506 INFO 127.0.0.1 - - [25/Sep/2026 13:19:27] "[32mPOST /login HTTP/1.1[0m" 302 -
+2026-09-25 13:19:27,533 INFO 127.0.0.1 - - [25/Sep/2026 13:19:27] "GET /verify-otp HTTP/1.1" 200 -
+2026-09-25 13:19:41,134 INFO OTP OK | User: nikhilll | IP: 127.0.0.1
+2026-09-25 13:19:41,160 INFO 127.0.0.1 - - [25/Sep/2026 13:19:41] "[32mPOST /verify-otp HTTP/1.1[0m" 302 -
+2026-09-25 13:19:41,198 INFO 127.0.0.1 - - [25/Sep/2026 13:19:41] "GET /verify-fingerprint HTTP/1.1" 200 -
+2026-09-25 13:19:47,738 INFO 3FA SUCCESS | User: nikhilll | IP: 127.0.0.1
+2026-09-25 13:19:47,764 INFO 127.0.0.1 - - [25/Sep/2026 13:19:47] "[32mPOST /verify-fingerprint HTTP/1.1[0m" 302 -
+2026-09-25 13:19:47,814 INFO 127.0.0.1 - - [25/Sep/2026 13:19:47] "GET /dashboard HTTP/1.1" 200 -
+2026-09-25 13:19:51,402 INFO 127.0.0.1 - - [25/Sep/2026 13:19:51] "GET /ids HTTP/1.1" 200 -
+2026-09-25 13:19:52,363 INFO 127.0.0.1 - - [25/Sep/2026 13:19:52] "GET /vault HTTP/1.1" 200 -
+2026-09-25 13:20:25,965 INFO 127.0.0.1 - - [25/Sep/2026 13:20:25] "[32mPOST /vault/upload HTTP/1.1[0m" 302 -
+2026-09-25 13:20:25,985 INFO 127.0.0.1 - - [25/Sep/2026 13:20:25] "GET /vault HTTP/1.1" 200 -
+2026-09-25 13:21:46,896 INFO 127.0.0.1 - - [25/Sep/2026 13:21:46] "[32mPOST /vault/upload HTTP/1.1[0m" 302 -
+2026-09-25 13:21:46,923 INFO 127.0.0.1 - - [25/Sep/2026 13:21:46] "GET /vault HTTP/1.1" 200 -
+2026-09-25 13:26:34,385 INFO 127.0.0.1 - - [25/Sep/2026 13:26:34] "[32mPOST /vault/add HTTP/1.1[0m" 302 -
+2026-09-25 13:26:34,412 INFO 127.0.0.1 - - [25/Sep/2026 13:26:34] "GET /vault HTTP/1.1" 200 -

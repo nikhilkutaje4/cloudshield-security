@@ -1,11 +1,14 @@
 from datetime import datetime
 import hashlib
+import base64
+from io import BytesIO
 from ids.autoencoder_predict import ensemble_predict, get_autoencoder_metadata
 from encryption.adaptive import (adaptive_encrypt, adaptive_decrypt,
                                   select_algorithm, ALGORITHMS,
                                   KYBER_AVAILABLE)
 from ids.explainer import explain_prediction
-from flask import Flask, render_template, request, redirect, url_for, session, flash
+from flask import Flask, render_template, request, redirect, url_for, session, flash, send_file
+from werkzeug.utils import secure_filename
 import sqlite3
 import bcrypt
 import os
@@ -79,6 +82,8 @@ def init_db():
             risk_score INTEGER DEFAULT 0,
             reason TEXT,
             created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+            is_file INTEGER DEFAULT 0,
+            original_filename TEXT,
             FOREIGN KEY (user_id) REFERENCES users(id)
         )
     ''')
@@ -478,49 +483,106 @@ def vault():
                            algo_counts=algo_counts,
                            kyber_available=KYBER_AVAILABLE)
 
-# ── VAULT: Add new encrypted item ──────────────────────────
-@app.route('/vault/add', methods=['POST'])
-def vault_add():
+# ── VAULT: Upload and encrypt a file ────────────────────────
+ALLOWED_VAULT_EXTENSIONS = {
+    'txt', 'pdf', 'docx', 'py', 'js', 'json', 'env', 'yaml', 'yml',
+    'zip', 'png', 'jpg', 'jpeg', 'csv', 'md'
+}
+MAX_VAULT_FILE_SIZE = 10 * 1024 * 1024  # 10 MB
+
+def _allowed_vault_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_VAULT_EXTENSIONS
+
+@app.route('/vault/upload', methods=['POST'])
+def vault_upload():
     if 'username' not in session:
         return redirect(url_for('login'))
-    
-    title = request.form['title']
-    data = request.form['data']
-    category = request.form.get('category', 'General')
+
+    if 'file' not in request.files or request.files['file'].filename == '':
+        flash('No file selected.', 'error')
+        return redirect(url_for('vault'))
+
+    file = request.files['file']
+    filename = secure_filename(file.filename)
+
+    if not _allowed_vault_file(filename):
+        flash(f"File type not allowed. Permitted: {', '.join(sorted(ALLOWED_VAULT_EXTENSIONS))}", 'error')
+        return redirect(url_for('vault'))
+
+    file_bytes = file.read()
+    if len(file_bytes) > MAX_VAULT_FILE_SIZE:
+        flash('File too large — 10 MB limit.', 'error')
+        return redirect(url_for('vault'))
+
+    category = request.form.get('category', 'Files')
     user_id = session['user_id']
     username = session['username']
-    
-    # ── Adaptive Algorithm Selection ──
+
+    # Binary → base64 text, so it can go through the same string-based
+    # adaptive_encrypt() used for vault text notes.
+    b64_data = base64.b64encode(file_bytes).decode('utf-8')
+
     threat_level = get_current_threat_level(username)
     recent_threats = get_recent_threat_count(username)
-    
+
     decision = select_algorithm(
         category=category,
         threat_level=threat_level,
-        data_size=len(data),
+        data_size=len(b64_data),
         recent_threats=recent_threats
     )
-    
-    # Encrypt with chosen algorithm
-    encrypted = adaptive_encrypt(data, decision['algorithm'])
-    
+
+    encrypted = adaptive_encrypt(b64_data, decision['algorithm'])
+
     conn = get_db()
     conn.execute(
-        '''INSERT INTO vault 
-           (user_id, title, encrypted_data, category, algorithm, risk_score, reason)
-           VALUES (?, ?, ?, ?, ?, ?, ?)''',
-        (user_id, title, encrypted, category, 
-         decision['algorithm'], decision['risk_score'], decision['reason'])
+        '''INSERT INTO vault
+           (user_id, title, encrypted_data, category, algorithm, risk_score, reason, is_file, original_filename)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)''',
+        (user_id, filename, encrypted, category,
+         decision['algorithm'], decision['risk_score'], decision['reason'], 1, filename)
     )
     conn.commit()
     conn.close()
-    
-    log_action(username, 
-               f"Vault Add: {title} → {decision['algorithm']}",
+
+    log_action(username,
+               f"Vault File Upload: {filename} → {decision['algorithm']}",
                request.remote_addr, 'Normal')
-    
-    flash(f"🔐 Encrypted with {decision['info']['icon']} {decision['algorithm']} — {decision['reason']}", 'success')
+
+    flash(f"🔐 File encrypted with {decision['info']['icon']} {decision['algorithm']} — {decision['reason']}", 'success')
     return redirect(url_for('vault'))
+
+# ── VAULT: Download and decrypt a file ──────────────────────
+@app.route('/vault/download/<int:item_id>')
+def vault_download(item_id):
+    if 'username' not in session:
+        return redirect(url_for('login'))
+
+    user_id = session['user_id']
+    conn = get_db()
+    item = conn.execute(
+        'SELECT * FROM vault WHERE id = ? AND user_id = ? AND is_file = 1',
+        (item_id, user_id)
+    ).fetchone()
+    conn.close()
+
+    if not item:
+        flash('File not found.', 'error')
+        return redirect(url_for('vault'))
+
+    algo = item['algorithm'] or 'AES-256-GCM'
+    b64_data = adaptive_decrypt(item['encrypted_data'], algo)
+    file_bytes = base64.b64decode(b64_data)
+
+    log_action(session['username'],
+               f"Vault File Download: {item['original_filename']}",
+               request.remote_addr, 'Normal')
+
+    return send_file(
+        BytesIO(file_bytes),
+        as_attachment=True,
+        download_name=item['original_filename']
+    )
 
 # ── VAULT: Delete item ─────────────────────────────────────
 @app.route('/vault/delete/<int:item_id>')
