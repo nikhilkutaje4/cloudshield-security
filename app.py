@@ -147,11 +147,14 @@ def verify_log_integrity():
     }
 
 def get_recent_threat_count(username):
-    """Count high/low threats in last 24 hours for this user"""
+    """Count high/low threats in last 24 hours — this user's own actions
+    PLUS any attacker-detected (EXTERNAL) threats, since a detected attack
+    raises system-wide risk regardless of who's currently logged in."""
     conn = get_db()
     count = conn.execute(
         '''SELECT COUNT(*) as c FROM logs 
-           WHERE username = ? AND threat_level IN ('High', 'Low')
+           WHERE (username = ? OR username = 'EXTERNAL')
+           AND threat_level IN ('High', 'Low')
            AND timestamp >= datetime('now', '-1 day')''',
         (username,)
     ).fetchone()['c']
@@ -159,16 +162,27 @@ def get_recent_threat_count(username):
     return count
 
 def get_current_threat_level(username):
-    """Get most recent threat level for this user"""
+    """Get the most severe recent threat level — checks this user's own
+    logs AND recent EXTERNAL (attacker-detected) entries, taking whichever
+    is more severe. This is what lets a fired attack actually raise the
+    encryption level for whoever is using the vault right now."""
     conn = get_db()
-    row = conn.execute(
+    rows = conn.execute(
         '''SELECT threat_level FROM logs 
-           WHERE username = ? 
-           ORDER BY timestamp DESC LIMIT 1''',
+           WHERE (username = ? OR username = 'EXTERNAL')
+           AND timestamp >= datetime('now', '-10 minutes')
+           ORDER BY timestamp DESC''',
         (username,)
-    ).fetchone()
+    ).fetchall()
     conn.close()
-    return row['threat_level'] if row else 'Normal'
+
+    if not rows:
+        return 'Normal'
+
+    severity_order = {'High': 3, 'Low': 2, 'Normal': 1}
+    levels = [row['threat_level'] for row in rows]
+    most_severe = max(levels, key=lambda lvl: severity_order.get(lvl, 0))
+    return most_severe
 
 init_db()
 
