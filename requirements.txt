@@ -13,4 +13,4 @@ shap==0.46.0
 kyber-py==1.0.1
 scipy==1.11.4
 gunicorn==21.2.0
-webauthn>=2.0
+
