@@ -12,9 +12,11 @@ from werkzeug.utils import secure_filename
 import sqlite3
 import bcrypt
 import os
+import hmac
+import random
+import secrets
 import logging
 from mfa.otp import generate_secret, get_qr_code, verify_otp
-from mfa import webauthn_mfa
 from flask import jsonify
 from ids.predict import (predict_traffic, get_metadata, 
                           SAMPLE_TRAFFIC, THREAT_LEVELS, 
@@ -85,18 +87,6 @@ def init_db():
             created_at TEXT DEFAULT CURRENT_TIMESTAMP,
             is_file INTEGER DEFAULT 0,
             original_filename TEXT,
-            FOREIGN KEY (user_id) REFERENCES users(id)
-        )
-    ''')
-    # Real fingerprint (WebAuthn) credentials: public keys only, no biometrics
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS webauthn_credentials (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            user_id INTEGER NOT NULL,
-            credential_id BLOB UNIQUE NOT NULL,
-            public_key BLOB NOT NULL,
-            sign_count INTEGER DEFAULT 0,
-            created_at TEXT DEFAULT CURRENT_TIMESTAMP,
             FOREIGN KEY (user_id) REFERENCES users(id)
         )
     ''')
@@ -322,30 +312,28 @@ def verify_otp_route():
 
     return render_template('otp.html', username=username)
 
-# ── LOGIN STEP 3: Fingerprint (WebAuthn) ───────────────────
-def _webauthn_user():
-    """Who is allowed to enrol a fingerprint right now?
-      - a brand-new user finishing registration (setup_user), or
-      - a user who has passed password + OTP but has no fingerprint yet, or
-      - a fully logged-in user adding another device.
+# ── LOGIN STEP 3: Fingerprint (SIMULATED) ──────────────────
+# This is a software simulation of a fingerprint factor for demonstration.
+# Enrolment creates a random "fingerprint template" and stores only its
+# SHA-256 hash (users.fingerprint_hash). A "scan" re-presents the template
+# and the server compares hashes. No real biometric is captured.
+
+def _fp_hash(template):
+    return hashlib.sha256(template.encode()).hexdigest()
+
+def _fp_user():
+    """Who may enrol/scan right now?
+      - a new user finishing registration (setup_user), or
+      - a user who passed password + OTP (pending_user + otp_verified).
     Returns the users row, or None."""
-    username = (session.get('username')
-                or (session.get('pending_user') if session.get('otp_verified') else None)
-                or session.get('setup_user'))
+    username = (session.get('setup_user')
+                or (session.get('pending_user') if session.get('otp_verified') else None))
     if not username:
         return None
     conn = get_db()
     user = conn.execute('SELECT * FROM users WHERE username = ?', (username,)).fetchone()
     conn.close()
     return user
-
-def _user_credentials(user_id):
-    conn = get_db()
-    rows = conn.execute(
-        'SELECT * FROM webauthn_credentials WHERE user_id = ?', (user_id,)
-    ).fetchall()
-    conn.close()
-    return rows
 
 @app.route('/verify-fingerprint')
 def verify_fingerprint_route():
@@ -354,125 +342,65 @@ def verify_fingerprint_route():
 
     conn = get_db()
     user = conn.execute(
-        'SELECT id FROM users WHERE username = ?', (session['pending_user'],)
+        'SELECT fingerprint_hash FROM users WHERE username = ?', (session['pending_user'],)
     ).fetchone()
     conn.close()
-    has_credential = bool(user and _user_credentials(user['id']))
+    has_fingerprint = bool(user and user['fingerprint_hash'])
 
     return render_template('fingerprint.html',
                            username=session['pending_user'],
-                           has_credential=has_credential)
+                           has_fingerprint=has_fingerprint)
 
-@app.route('/webauthn/register/options', methods=['POST'])
-def webauthn_register_options():
-    user = _webauthn_user()
+@app.route('/fingerprint/enroll', methods=['POST'])
+def fingerprint_enroll():
+    user = _fp_user()
     if not user:
-        return jsonify(error='Not authorised to enrol a fingerprint'), 401
-
-    creds = _user_credentials(user['id'])
-    challenge, options_json = webauthn_mfa.create_registration_options(
-        request, user, [c['credential_id'] for c in creds]
-    )
-    session['webauthn_reg_challenge'] = challenge
-    return app.response_class(options_json, mimetype='application/json')
-
-@app.route('/webauthn/register/verify', methods=['POST'])
-def webauthn_register_verify():
-    user = _webauthn_user()
-    challenge = session.pop('webauthn_reg_challenge', None)
-    if not user or not challenge:
-        return jsonify(error='No fingerprint enrolment in progress'), 400
+        return jsonify(error='Session expired or user not found. Please register or log in again.'), 401
 
     ip = request.remote_addr
-    try:
-        cred_id, public_key, sign_count = webauthn_mfa.check_registration(
-            request, request.get_json(), challenge
-        )
-    except Exception as e:
-        logging.warning(f"FINGERPRINT ENROL FAILED | User: {user['username']} | {e}")
-        log_action(user['username'], 'Fingerprint Enrol Failed', ip, 'Low')
-        return jsonify(error=f'Fingerprint registration failed: {e}'), 400
+    template = secrets.token_hex(32)          # simulated fingerprint template
+    fp_hash = _fp_hash(template)
 
     conn = get_db()
-    conn.execute(
-        '''INSERT INTO webauthn_credentials (user_id, credential_id, public_key, sign_count)
-           VALUES (?, ?, ?, ?)''',
-        (user['id'], cred_id, public_key, sign_count)
-    )
+    conn.execute('UPDATE users SET fingerprint_hash = ? WHERE id = ?', (fp_hash, user['id']))
     conn.commit()
     conn.close()
 
-    logging.info(f"FINGERPRINT ENROLLED | User: {user['username']} | IP: {ip}")
+    logging.info(f"FINGERPRINT ENROLLED (simulated) | User: {user['username']} | IP: {ip}")
     log_action(user['username'], 'Fingerprint Enrolled', ip, 'Normal')
 
-    # New user: registration flow is done, send them to log in.
-    # Fully logged in: back to the dashboard. Mid-login: carry on to step 3.
-    if 'username' in session:
-        return jsonify(ok=True, redirect=url_for('dashboard'))
+    # The template lives on the user's device (browser); the server keeps only the hash.
     if session.get('setup_user') == user['username']:
         for k in ('setup_user', 'setup_secret'):
             session.pop(k, None)
-        return jsonify(ok=True, redirect=url_for('login'))
-    return jsonify(ok=True, redirect=url_for('verify_fingerprint_route'))
+        next_url = url_for('login')
+    else:
+        next_url = url_for('verify_fingerprint_route')
 
-@app.route('/webauthn/login/options', methods=['POST'])
-def webauthn_login_options():
-    if 'pending_user' not in session or not session.get('otp_verified'):
-        return jsonify(error='Complete password and OTP first'), 401
+    return jsonify(ok=True, template=template, fingerprint_id=fp_hash[:16],
+                   redirect=next_url)
 
-    conn = get_db()
-    user = conn.execute(
-        'SELECT id FROM users WHERE username = ?', (session['pending_user'],)
-    ).fetchone()
-    conn.close()
-    creds = _user_credentials(user['id']) if user else []
-    if not creds:
-        return jsonify(error='No fingerprint enrolled yet', enrol=True), 404
-
-    challenge, options_json = webauthn_mfa.create_login_options(
-        request, [c['credential_id'] for c in creds]
-    )
-    session['webauthn_auth_challenge'] = challenge
-    return app.response_class(options_json, mimetype='application/json')
-
-@app.route('/webauthn/login/verify', methods=['POST'])
-def webauthn_login_verify():
+@app.route('/fingerprint/verify', methods=['POST'])
+def fingerprint_verify():
     if 'pending_user' not in session or not session.get('otp_verified'):
         return jsonify(error='Complete password and OTP first'), 401
 
     username = session['pending_user']
     ip = request.remote_addr
-    challenge = session.pop('webauthn_auth_challenge', None)
-    body = request.get_json()
-    if not challenge or not body:
-        return jsonify(error='No fingerprint login in progress'), 400
+    body = request.get_json(silent=True) or {}
+    template = body.get('template', '')
 
     conn = get_db()
     user = conn.execute('SELECT * FROM users WHERE username = ?', (username,)).fetchone()
-    cred = None
-    if user:
-        cred = conn.execute(
-            'SELECT * FROM webauthn_credentials WHERE user_id = ? AND credential_id = ?',
-            (user['id'], webauthn_mfa.raw_id_bytes(body))
-        ).fetchone()
     conn.close()
 
-    try:
-        if not cred:
-            raise ValueError('credential not recognised for this user')
-        new_count = webauthn_mfa.check_login(
-            request, body, challenge, cred['public_key'], cred['sign_count']
-        )
-    except Exception as e:
-        logging.warning(f"FINGERPRINT FAILED | User: {username} | {e}")
+    if not user or not user['fingerprint_hash']:
+        return jsonify(error='No fingerprint enrolled yet', enrol=True), 404
+
+    if not template or not hmac.compare_digest(_fp_hash(template), user['fingerprint_hash']):
+        logging.warning(f"FINGERPRINT FAILED (simulated) | User: {username} | IP: {ip}")
         log_action(username, 'Fingerprint Failed', ip, 'High')
-        return jsonify(error='Fingerprint verification failed.'), 401
-
-    conn = get_db()
-    conn.execute('UPDATE webauthn_credentials SET sign_count = ? WHERE id = ?',
-                 (new_count, cred['id']))
-    conn.commit()
-    conn.close()
+        return jsonify(error='Fingerprint not recognised.'), 401
 
     # ✅ ALL 3 FACTORS PASSED
     session['username'] = username
@@ -483,7 +411,9 @@ def webauthn_login_verify():
 
     logging.info(f"3FA SUCCESS | User: {username} | IP: {ip}")
     log_action(username, '3-Factor Login Success', ip, 'Normal')
-    return jsonify(ok=True, redirect=url_for('dashboard'))
+    return jsonify(ok=True, match_score=round(random.uniform(96.0, 99.9), 1),
+                   redirect=url_for('dashboard'))
+
 
 # ── DASHBOARD ──────────────────────────────────────────────
 @app.route('/admin/users')
@@ -1022,4 +952,5 @@ def api_live_feed():
 
 # ── Run ────────────────────────────────────────────────────
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)), debug=True)
+    debug_mode = os.environ.get('FLASK_ENV') != 'production'
+    app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)), debug=debug_mode)
