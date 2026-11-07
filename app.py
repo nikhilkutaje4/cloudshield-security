@@ -12,6 +12,9 @@ from werkzeug.utils import secure_filename
 import sqlite3
 import bcrypt
 import os
+import hmac
+import random
+import secrets
 import logging
 from mfa.otp import generate_secret, get_qr_code, verify_otp
 from flask import jsonify
@@ -55,6 +58,7 @@ def init_db():
             email TEXT UNIQUE NOT NULL,
             password TEXT NOT NULL,
             otp_secret TEXT,
+            fingerprint_hash TEXT,
             created_at TEXT DEFAULT CURRENT_TIMESTAMP
         )
     ''')
@@ -86,6 +90,11 @@ def init_db():
             FOREIGN KEY (user_id) REFERENCES users(id)
         )
     ''')
+    # Older databases created before the fingerprint step lack this column
+    try:
+        cursor.execute('ALTER TABLE users ADD COLUMN fingerprint_hash TEXT')
+    except sqlite3.OperationalError:
+        pass  # column already exists
     conn.commit()
     conn.close()
     print("[+] Database initialized successfully")
@@ -236,23 +245,19 @@ def setup_mfa():
     qr_code = get_qr_code(username, secret)
 
     # NOTE: the "Continue" button on setup_mfa.html should link to
-    # url_for('login') (url_for('setup_fingerprint') still works and just redirects).
+    # url_for('setup_fingerprint').
     return render_template('setup_mfa.html',
                            username=username,
                            secret=secret,
                            qr_code=qr_code)
 
 
-# ── END OF REGISTRATION ────────────────────────────────────
-# The "Continue" button on setup_mfa.html points here. Registration is
-# complete once the QR code is scanned, so clear the setup session and
-# send the user to log in. (Change that button to url_for('login') and
-# this route can then be deleted.)
+# ── FINGERPRINT ENROLMENT PAGE (right after registration) ──
 @app.route('/setup-fingerprint')
 def setup_fingerprint():
-    for k in ('setup_user', 'setup_secret'):
-        session.pop(k, None)
-    return redirect(url_for('login'))
+    if 'setup_user' not in session:
+        return redirect(url_for('register'))
+    return render_template('setup_fingerprint.html', username=session['setup_user'])
 
 
 # ── LOGIN STEP 1: Password ─────────────────────────────────
@@ -283,7 +288,7 @@ def login():
 
     return render_template('login.html')
 
-# ── LOGIN STEP 2: OTP (final step) ─────────────────────────
+# ── LOGIN STEP 2: OTP ──────────────────────────────────────
 @app.route('/verify-otp', methods=['GET', 'POST'])
 def verify_otp_route():
     if 'pending_user' not in session:
@@ -297,27 +302,124 @@ def verify_otp_route():
 
         conn = get_db()
         user = conn.execute(
-            'SELECT id, otp_secret FROM users WHERE username = ?', (username,)
+            'SELECT otp_secret FROM users WHERE username = ?', (username,)
         ).fetchone()
         conn.close()
 
         if user and verify_otp(user['otp_secret'], otp_code):
-            # ✅ BOTH FACTORS PASSED
-            session['username'] = username
-            session['user_id'] = user['id']
-            session.pop('pending_user', None)
-            session.pop('pending_user_id', None)
-
-            logging.info(f"2FA SUCCESS | User: {username} | IP: {ip}")
+            session['otp_verified'] = True
+            logging.info(f"OTP OK | User: {username} | IP: {ip}")
             log_action(username, 'OTP Verified', ip, 'Normal')
-            log_action(username, '2-Factor Login Success', ip, 'Normal')
-            return redirect(url_for('dashboard'))
+            return redirect(url_for('verify_fingerprint_route'))
         else:
             flash('Invalid OTP code. Try again.', 'danger')
             logging.warning(f"OTP FAILED | User: {username} | IP: {ip}")
             log_action(username, 'OTP Failed', ip, 'High')
 
     return render_template('otp.html', username=username)
+
+# ── LOGIN STEP 3: Fingerprint (SIMULATED) ──────────────────
+# Software simulation of a fingerprint factor, for demonstration.
+# Enrolment creates a random "fingerprint template", stores only its
+# SHA-256 hash (users.fingerprint_hash) and hands the template to the
+# browser. A "scan" re-presents the template and the server compares
+# hashes. No real biometric is captured.
+
+def _fp_hash(template):
+    return hashlib.sha256(template.encode()).hexdigest()
+
+def _fp_user():
+    """Who may enrol/scan right now?
+      - a new user finishing registration (setup_user), or
+      - a user who passed password + OTP (pending_user + otp_verified).
+    Returns the users row, or None."""
+    username = (session.get('setup_user')
+                or (session.get('pending_user') if session.get('otp_verified') else None))
+    if not username:
+        return None
+    conn = get_db()
+    user = conn.execute('SELECT * FROM users WHERE username = ?', (username,)).fetchone()
+    conn.close()
+    return user
+
+@app.route('/verify-fingerprint')
+def verify_fingerprint_route():
+    if 'pending_user' not in session or not session.get('otp_verified'):
+        return redirect(url_for('login'))
+
+    conn = get_db()
+    user = conn.execute(
+        'SELECT fingerprint_hash FROM users WHERE username = ?', (session['pending_user'],)
+    ).fetchone()
+    conn.close()
+    has_fingerprint = bool(user and user['fingerprint_hash'])
+
+    return render_template('fingerprint.html',
+                           username=session['pending_user'],
+                           has_fingerprint=has_fingerprint)
+
+@app.route('/fingerprint/enroll', methods=['POST'])
+def fingerprint_enroll():
+    user = _fp_user()
+    if not user:
+        return jsonify(error='Session expired or user not found. Please register or log in again.'), 401
+
+    ip = request.remote_addr
+    template = secrets.token_hex(32)          # simulated fingerprint template
+    fp_hash = _fp_hash(template)
+
+    conn = get_db()
+    conn.execute('UPDATE users SET fingerprint_hash = ? WHERE id = ?', (fp_hash, user['id']))
+    conn.commit()
+    conn.close()
+
+    logging.info(f"FINGERPRINT ENROLLED (simulated) | User: {user['username']} | IP: {ip}")
+    log_action(user['username'], 'Fingerprint Enrolled', ip, 'Normal')
+
+    # The template lives on the user's device (browser); the server keeps only the hash.
+    if session.get('setup_user') == user['username']:
+        for k in ('setup_user', 'setup_secret'):
+            session.pop(k, None)
+        next_url = url_for('login')
+    else:
+        next_url = url_for('verify_fingerprint_route')
+
+    return jsonify(ok=True, template=template, fingerprint_id=fp_hash[:16],
+                   redirect=next_url)
+
+@app.route('/fingerprint/verify', methods=['POST'])
+def fingerprint_verify():
+    if 'pending_user' not in session or not session.get('otp_verified'):
+        return jsonify(error='Complete password and OTP first'), 401
+
+    username = session['pending_user']
+    ip = request.remote_addr
+    body = request.get_json(silent=True) or {}
+    template = body.get('template', '')
+
+    conn = get_db()
+    user = conn.execute('SELECT * FROM users WHERE username = ?', (username,)).fetchone()
+    conn.close()
+
+    if not user or not user['fingerprint_hash']:
+        return jsonify(error='No fingerprint enrolled yet', enrol=True), 404
+
+    if not template or not hmac.compare_digest(_fp_hash(template), user['fingerprint_hash']):
+        logging.warning(f"FINGERPRINT FAILED (simulated) | User: {username} | IP: {ip}")
+        log_action(username, 'Fingerprint Failed', ip, 'High')
+        return jsonify(error='Fingerprint not recognised.'), 401
+
+    # ✅ ALL 3 FACTORS PASSED
+    session['username'] = username
+    session['user_id'] = user['id']
+    session.pop('pending_user', None)
+    session.pop('pending_user_id', None)
+    session.pop('otp_verified', None)
+
+    logging.info(f"3FA SUCCESS | User: {username} | IP: {ip}")
+    log_action(username, '3-Factor Login Success', ip, 'Normal')
+    return jsonify(ok=True, match_score=round(random.uniform(96.0, 99.9), 1),
+                   redirect=url_for('dashboard'))
 
 
 # ── DASHBOARD ──────────────────────────────────────────────
@@ -694,10 +796,11 @@ def auth_log():
         '''SELECT * FROM logs 
            WHERE action IN ('Login Success', 'Login Failed', 
                             'Password Verified', 'OTP Verified', 
-                            'OTP Failed',
-                            '2-Factor Login Success', 'Logout')
+                            'OTP Failed', 'Fingerprint Failed',
+                            '3-Factor Login Success', 'Logout')
               OR action LIKE '%Login%' 
               OR action LIKE '%OTP%'
+              OR action LIKE '%Fingerprint%'
               OR action LIKE '%Logout%'
            ORDER BY timestamp DESC LIMIT 100''',
     ).fetchall()
